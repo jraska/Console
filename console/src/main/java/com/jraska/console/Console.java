@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -23,7 +24,7 @@ import java.util.List;
  * all calls to console static write methods will affect all instantiated consoles.
  * You can also call writes directly to console view.
  */
-public class Console extends FrameLayout {
+public final class Console extends FrameLayout {
   //region Static
 
   private static List<WeakReference<Console>> _consoles = new ArrayList<>();
@@ -43,10 +44,21 @@ public class Console extends FrameLayout {
 
   //endregion
 
+  //region Constants
+
+  protected static final String REMOVING_UNSUPPORTED_MESSAGE
+      = "Removing of Views is unsupported in " + Console.class;
+
+  //endregion
+
   //region Fields
 
   private TextView _text;
   private ScrollView _scrollView;
+
+  // This will serve as flag for all view modifying methods
+  // of Console to be suppressed from outside
+  private boolean _privateLayoutInflated;
 
   //endregion
 
@@ -78,6 +90,7 @@ public class Console extends FrameLayout {
     _consoles.add(new WeakReference<>(this));
 
     LayoutInflater.from(context).inflate(R.layout.content_console, this);
+    _privateLayoutInflated = true;
 
     _text = (TextView) findViewById(R.id.console_text);
     if (_text == null) {
@@ -88,6 +101,55 @@ public class Console extends FrameLayout {
     if (_scrollView == null) {
       throw new IllegalStateException("There is no ScrollView with id 'console_scroll_view' in Console");
     }
+  }
+
+  //endregion
+
+  //region FrameLayout overrides
+
+  @Override
+  public void addView(View child, int index, ViewGroup.LayoutParams params) {
+    // its not possible to add views to Console, allow this only on initial layout creations
+    if (!_privateLayoutInflated) {
+      super.addView(child, index, params);
+    } else {
+      throw new UnsupportedOperationException("You cannot add views to " + Console.class);
+    }
+  }
+
+  @Override
+  public void removeView(View view) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeViewInLayout(View view) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeViewsInLayout(int start, int count) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeViewAt(int index) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeViews(int start, int count) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeAllViews() {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public void removeAllViewsInLayout() {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
   }
 
   //endregion

@@ -28,4 +28,5 @@ dependencies {
   compile 'com.jakewharton:butterknife:7.0.1'
 
   testCompile 'junit:junit:4.12'
+  testCompile "org.robolectric:robolectric:3.0"
 }
