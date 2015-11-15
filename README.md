@@ -1,6 +1,8 @@
 # Console
 Android console implementation allows static console calls to easy debug your application
 
+[![Build Status](https://travis-ci.org/jraska/Console.svg)](https://travis-ci.org/jraska/Console)
+
 ## License
 
     Copyright 2015 Josef Raska
