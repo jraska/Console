@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * all calls to console static write methods will affect all instantiated consoles.
  * You can also call writes directly to console view.
  */
-public class Console extends ScrollView {
+public class Console extends FrameLayout {
   //region Static
 
   private static List<WeakReference<Console>> _consoles = new ArrayList<>();
@@ -45,6 +46,7 @@ public class Console extends ScrollView {
   //region Fields
 
   private TextView _text;
+  private ScrollView _scrollView;
 
   //endregion
 
@@ -79,7 +81,12 @@ public class Console extends ScrollView {
 
     _text = (TextView) findViewById(R.id.console_text);
     if (_text == null) {
-      throw new IllegalStateException("Console text is null, there have to be TextView with id console_text");
+      throw new IllegalStateException("There is no TextView with id 'console_text' in Console");
+    }
+
+    _scrollView = (ScrollView) findViewById(R.id.console_scroll_view);
+    if (_scrollView == null) {
+      throw new IllegalStateException("There is no ScrollView with id 'console_scroll_view' in Console");
     }
   }
 
@@ -101,7 +108,7 @@ public class Console extends ScrollView {
     }
 
     _text.append(text);
-    fullScroll(View.FOCUS_DOWN);
+    _scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
   protected void appendLine(String line) {
