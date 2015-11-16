@@ -1,7 +1,36 @@
 # Console
-Android console implementation allows static console calls to easy debug your application
+Android console implementation allows static console calls to easy debug your application without memory leaks.
 
 [![Build Status](https://travis-ci.org/jraska/Console.svg)](https://travis-ci.org/jraska/Console)
+[![Download](https://api.bintray.com/packages/jraska/maven/com.jraska%3Aconsole/images/download.svg) ](https://bintray.com/jraska/maven/com.jraska%3Aconsole/_latestVersion)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg) ](https://github.com/jraska/Falcon/blob/master/LICENSE)
+
+## Usage
+
+Include Console anywhere in your layout:
+
+```xml
+<com.jraska.console.Console
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+```
+
+then write to it:
+
+```java
+// Writing to console
+Console.write("This is cool");
+Console.writeLine("More cool");
+// Clear it
+Console.clear();
+```
+
+## Download
+
+Grab via Gradle: 
+```groovy
+compile 'com.jraska:console:0.1.0'
+```
 
 ## License
 
