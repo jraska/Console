@@ -25,33 +25,50 @@ import java.util.List;
  * You can also call writes directly to console view.
  */
 public final class Console extends FrameLayout {
-  //region Static
-
-  private static List<WeakReference<Console>> _consoles = new ArrayList<>();
-
-  public static void writeLine(Object o) {
-    // iteration from the end to allow in place removing
-    for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
-      WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
-      Console console = consoleReference.get();
-      if (console == null) {
-        _consoles.remove(consoleIndex);
-      } else {
-        console.writeLn(o);
-      }
-    }
-  }
-
-  //endregion
-
   //region Constants
 
-  protected static final String REMOVING_UNSUPPORTED_MESSAGE
+  static final String END_LINE = "\n";
+  static final String REMOVING_UNSUPPORTED_MESSAGE
       = "Removing of Views is unsupported in " + Console.class;
 
   //endregion
 
+  //region Public Static API
+
+  /**
+   * Write provided object String representation to console and starts new line
+   * "null" is written if the object is null
+   *
+   * @param o Object to write
+   */
+  public static void writeLine(Object o) {
+    WriteLine writeLine = new WriteLine(o);
+    performAction(writeLine);
+  }
+
+  /**
+   * Write provided object String representation to console
+   * "null" is written if the object is null
+   *
+   * @param o Object to write
+   */
+  public static void write(Object o) {
+    Write write = new Write(o);
+    performAction(write);
+  }
+
+  /**
+   * Clears the console text
+   */
+  public static void clear() {
+    performAction(Clear.INSTANCE);
+  }
+
+  //endregion
+
   //region Fields
+
+  private static List<WeakReference<Console>> _consoles = new ArrayList<>();
 
   private TextView _text;
   private ScrollView _scrollView;
@@ -101,6 +118,19 @@ public final class Console extends FrameLayout {
     if (_scrollView == null) {
       throw new IllegalStateException("There is no ScrollView with id 'console_scroll_view' in Console");
     }
+  }
+
+  //endregion
+
+  //region Properties
+
+  String getConsoleText() {
+    CharSequence text = _text.getText();
+    if (text == null) {
+      return "";
+    }
+
+    return text.toString();
   }
 
   //endregion
@@ -156,7 +186,15 @@ public final class Console extends FrameLayout {
 
   //region Methods
 
-  protected void writeLn(Object o) {
+  void writeInternal(Object o) {
+    if (o == null) {
+      appendText("null");
+    } else {
+      appendText(o.toString());
+    }
+  }
+
+  void writeLineInternal(Object o) {
     if (o == null) {
       appendLine("null");
     } else {
@@ -164,7 +202,11 @@ public final class Console extends FrameLayout {
     }
   }
 
-  protected void appendText(String text) {
+  void clearInternal() {
+    _text.setText("");
+  }
+
+  void appendText(String text) {
     if (text == null) {
       throw new IllegalArgumentException("text cannot be null");
     }
@@ -173,9 +215,66 @@ public final class Console extends FrameLayout {
     _scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
-  protected void appendLine(String line) {
+  void appendLine(String line) {
     appendText(line);
-    appendText("\n");
+    appendText(END_LINE);
+  }
+
+  private static void performAction(ConsoleAction action) {
+    // iteration from the end to allow in place removing
+    for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
+      WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
+      Console console = consoleReference.get();
+      if (console == null) {
+        _consoles.remove(consoleIndex);
+      } else {
+        action.perform(console);
+      }
+    }
+  }
+
+  //endregion
+
+  //region Nested classes
+
+  /**
+   * This abstraction is here to have only one implementation of consoles
+   * traversing and removing already released references.
+   */
+  interface ConsoleAction {
+    void perform(Console console);
+  }
+
+  static final class Clear implements ConsoleAction {
+    static final Clear INSTANCE = new Clear();
+
+    @Override public void perform(Console console) {
+      console.clearInternal();
+    }
+  }
+
+  static final class WriteLine implements ConsoleAction {
+    private final Object _value;
+
+    public WriteLine(Object value) {
+      _value = value;
+    }
+
+    @Override public void perform(Console console) {
+      console.writeLineInternal(_value);
+    }
+  }
+
+  static final class Write implements ConsoleAction {
+    private final Object _value;
+
+    public Write(Object value) {
+      _value = value;
+    }
+
+    @Override public void perform(Console console) {
+      console.writeInternal(_value);
+    }
   }
 
   //endregion
