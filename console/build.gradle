@@ -18,7 +18,7 @@ android {
     targetCompatibility rootProject.ext.sourceCompatibility
   }
 
-  // TODO: Remove this after Travis fix - Lint fails only there not during local build
+  // TODO: Remove this after Travis fix - Lint fails only there, not during local build
   lintOptions {
     abortOnError false
   }
