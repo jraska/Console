@@ -24,7 +24,7 @@ import java.util.List;
  * all calls to console static write methods will affect all instantiated consoles.
  * You can also call writes directly to console view.
  */
-public final class Console extends FrameLayout {
+public class Console extends FrameLayout {
   //region Constants
 
   static final String END_LINE = "\n";
@@ -71,11 +71,14 @@ public final class Console extends FrameLayout {
   private static List<WeakReference<Console>> _consoles = new ArrayList<>();
 
   private TextView _text;
-  private ScrollView _scrollView;
 
   // This will serve as flag for all view modifying methods
   // of Console to be suppressed from outside
   private boolean _privateLayoutInflated;
+
+  // Fields is used to not schedule more than one runnable for scroll down
+  private boolean _fullScrollScheduled;
+  private Runnable _scrollDownRunnable;
 
   //endregion
 
@@ -110,7 +113,9 @@ public final class Console extends FrameLayout {
     _privateLayoutInflated = true;
 
     _text = findViewByIdSafe(R.id.console_text);
-    _scrollView = findViewByIdSafe(R.id.console_scroll_view);
+
+    ScrollView scrollView = findViewByIdSafe(R.id.console_scroll_view);
+    _scrollDownRunnable = new ScrollDownRunnable(scrollView);
   }
 
   //endregion
@@ -129,6 +134,13 @@ public final class Console extends FrameLayout {
   //endregion
 
   //region FrameLayout overrides
+
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+    _fullScrollScheduled = false;
+  }
 
   @Override
   public void addView(View child, int index, ViewGroup.LayoutParams params) {
@@ -205,7 +217,11 @@ public final class Console extends FrameLayout {
     }
 
     _text.append(text);
-    _scrollView.fullScroll(View.FOCUS_DOWN);
+
+    if (!_fullScrollScheduled) {
+      post(_scrollDownRunnable);
+      _fullScrollScheduled = true;
+    }
   }
 
   void appendLine(String line) {
@@ -266,6 +282,21 @@ public final class Console extends FrameLayout {
   //endregion
 
   //region Nested classes
+
+  static class ScrollDownRunnable implements Runnable {
+    private final ScrollView _scrollView;
+
+    ScrollDownRunnable(ScrollView scrollView) {
+      if (scrollView == null) {
+        throw new IllegalArgumentException("scrollView cannot be null");
+      }
+      _scrollView = scrollView;
+    }
+
+    @Override public void run() {
+      _scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+  }
 
   /**
    * This abstraction is here to have only one implementation of consoles

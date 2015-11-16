@@ -9,9 +9,15 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * Test is moved here from console library module to enable Robolectric testing
@@ -60,6 +66,16 @@ public class ConsoleTest {
     Console.clear();
 
     assertThat(_console.getConsoleText(), equalTo(""));
+  }
+
+  @Test
+  public void testScrollDownScheduledOnlyOnceOnMultiWrite() throws Exception {
+    Console consoleSpy = spy(_console);
+
+    consoleSpy.writeInternal("someText");
+    consoleSpy.writeLineInternal("line");
+
+    verify(consoleSpy, times(1)).post(isA(Console.ScrollDownRunnable.class));
   }
 
   //region View methods failures tests
