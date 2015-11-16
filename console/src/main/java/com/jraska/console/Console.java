@@ -2,6 +2,7 @@ package com.jraska.console;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -109,15 +110,8 @@ public final class Console extends FrameLayout {
     LayoutInflater.from(context).inflate(R.layout.console_content, this);
     _privateLayoutInflated = true;
 
-    _text = (TextView) findViewById(R.id.console_text);
-    if (_text == null) {
-      throw new IllegalStateException("There is no TextView with id 'console_text' in Console");
-    }
-
-    _scrollView = (ScrollView) findViewById(R.id.console_scroll_view);
-    if (_scrollView == null) {
-      throw new IllegalStateException("There is no ScrollView with id 'console_scroll_view' in Console");
-    }
+    _text = findViewByIdSafe(R.id.console_text);
+    _scrollView = findViewByIdSafe(R.id.console_scroll_view);
   }
 
   //endregion
@@ -230,6 +224,43 @@ public final class Console extends FrameLayout {
       } else {
         action.perform(console);
       }
+    }
+  }
+
+  /**
+   * Throws exception if the view is not found
+   *
+   * @return View for the id
+   */
+  @SuppressWarnings("unchecked") // Class cast is checked with exception catch
+  private <T extends View> T findViewByIdSafe(int resId) {
+    View view = findViewById(resId);
+
+    if (view != null) {
+      try {
+        return (T) view;
+      }
+      catch (ClassCastException ex) {
+        // Just transfer message for better debug information
+        String resName = getResourceName(resId);
+        String message = "View with id " + resName + " is of wrong type, see inner exception";
+        throw new IllegalStateException(message, ex);
+      }
+    }
+
+    String resName = getResourceName(resId);
+
+    String message = "There is no view with resource id" + resName + " in " + Console.class;
+    throw new IllegalArgumentException(message);
+  }
+
+  private String getResourceName(int resId) {
+    try {
+      return getResources().getResourceName(resId);
+    }
+    catch (Resources.NotFoundException ignored) {
+      // Just take hex representation of string
+      return Integer.toHexString(resId);
     }
   }
 
