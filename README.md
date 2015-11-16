@@ -2,8 +2,9 @@
 Android console implementation allows static console calls to easy debug your application without memory leaks.
 
 [![Build Status](https://travis-ci.org/jraska/Console.svg)](https://travis-ci.org/jraska/Console)
-[![Download](https://api.bintray.com/packages/jraska/maven/com.jraska%3Aconsole/images/download.svg) ](https://bintray.com/jraska/maven/com.jraska%3Aconsole/_latestVersion)
+[![Sample](https://img.shields.io/badge/Download-Sample-blue.svg)](https://drive.google.com/file/d/0B0T1YjC17C-rTDBWNDBaSWVhcjg/view?usp=sharing)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg) ](https://github.com/jraska/Falcon/blob/master/LICENSE)
+[![Download](https://api.bintray.com/packages/jraska/maven/com.jraska%3Aconsole/images/download.svg) ](https://bintray.com/jraska/maven/com.jraska%3Aconsole/_latestVersion)
 
 ## Usage
 
