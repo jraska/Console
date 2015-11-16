@@ -5,7 +5,8 @@
         android:id="@+id/console_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black">
+        android:background="@android:color/black"
+        android:scrollbarThumbVertical="@drawable/console_scrollbar_handle">
 
         <TextView
             android:id="@+id/console_text"

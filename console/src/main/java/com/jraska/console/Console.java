@@ -89,7 +89,7 @@ public final class Console extends FrameLayout {
     // Store myself as weak reference for static method calls
     _consoles.add(new WeakReference<>(this));
 
-    LayoutInflater.from(context).inflate(R.layout.content_console, this);
+    LayoutInflater.from(context).inflate(R.layout.console_content, this);
     _privateLayoutInflated = true;
 
     _text = (TextView) findViewById(R.id.console_text);
