@@ -20,7 +20,6 @@ import java.util.List;
 /**
  * Console like output view, which allows writing via static console methods
  * from anywhere of application.
- * <p/>
  * If you want to see the output, you should use console in any of your layouts,
  * all calls to console static write methods will affect all instantiated consoles.
  * You can also call writes directly to console view.
