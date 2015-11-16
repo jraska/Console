@@ -6,6 +6,8 @@ Android console implementation allows static console calls to easy debug your ap
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg) ](https://github.com/jraska/Console/blob/master/LICENSE)
 [![Download](https://api.bintray.com/packages/jraska/maven/com.jraska%3Aconsole/images/download.svg) ](https://bintray.com/jraska/maven/com.jraska%3Aconsole/_latestVersion)
 
+![](images/sample_screen.png)
+
 ## Usage
 
 Include Console anywhere in your layout:

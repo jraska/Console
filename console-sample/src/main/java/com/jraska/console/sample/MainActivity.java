@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
   //region Constants
 
   public static final DateFormat DATE_FORMAT
-      = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+      = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 
   //endregion
 
@@ -38,6 +38,23 @@ public class MainActivity extends AppCompatActivity {
     ButterKnife.bind(this);
 
     setSupportActionBar(_toolbar);
+
+    Console.write(currentTime() + " onCreate(");
+    Console.write(savedInstanceState);
+    Console.writeLine(")");
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+
+    Console.writeLine(currentTime() + " onStart()");
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+
+    Console.writeLine(currentTime() + " onResume()");
   }
 
   @Override
@@ -64,8 +81,12 @@ public class MainActivity extends AppCompatActivity {
 
   //region Methods
 
-  @OnClick(R.id.fab) void addConsoleRecord() {
-    Console.writeLine(DATE_FORMAT.format(new Date()) + " Console record");
+  @OnClick(R.id.fab) void addSampleRecord() {
+    Console.writeLine("Sample console record at " + currentTime());
+  }
+
+  private String currentTime() {
+    return DATE_FORMAT.format(new Date());
   }
 
   //endregion
