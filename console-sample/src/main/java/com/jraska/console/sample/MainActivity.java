@@ -1,5 +1,6 @@
 package com.jraska.console.sample;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -74,8 +75,14 @@ public class MainActivity extends AppCompatActivity {
       return true;
     }
 
+    if (id == R.id.action_console_async) {
+      onAsyncClicked();
+      return true;
+    }
+
     return super.onOptionsItemSelected(item);
   }
+
 
   //endregion
 
@@ -87,6 +94,39 @@ public class MainActivity extends AppCompatActivity {
 
   private String currentTime() {
     return DATE_FORMAT.format(new Date());
+  }
+
+  void onAsyncClicked() {
+    TestAsyncTask testAsyncTask = new TestAsyncTask();
+    testAsyncTask.execute(1000L);
+  }
+
+  //endregion
+
+  //region Nested classes
+
+  public static class TestAsyncTask extends AsyncTask<Long, Void, Void> {
+    @Override protected Void doInBackground(Long... params) {
+      long time = params[0];
+
+      sleep(time);
+      Console.writeLine("Message from async task after " + time + " ms");
+      sleep(time);
+      Console.write("Console will be cleared in next " + time + " ms");
+      sleep(time);
+      Console.clear();
+
+      return null;
+    }
+
+    private void sleep(long time) {
+      try {
+        Thread.sleep(time);
+      }
+      catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   //endregion

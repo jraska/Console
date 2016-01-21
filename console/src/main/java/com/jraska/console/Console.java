@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,6 +72,10 @@ public class Console extends FrameLayout {
 
   private static List<WeakReference<Console>> _consoles = new ArrayList<>();
 
+  // Handler for case writing is called from wrong thread
+  private static volatile Handler __uiThreadHandler;
+  private static final Object __lock = new Object();
+
   private TextView _text;
 
   // This will serve as flag for all view modifying methods
@@ -129,6 +135,22 @@ public class Console extends FrameLayout {
     }
 
     return text.toString();
+  }
+
+  private static Handler getUIThreadHandler() {
+    if (__uiThreadHandler == null) {
+      synchronized (__lock) {
+        if (__uiThreadHandler == null) {
+          __uiThreadHandler = new Handler(Looper.getMainLooper());
+        }
+      }
+    }
+
+    return __uiThreadHandler;
+  }
+
+  private static boolean isUIThread() {
+    return Looper.myLooper() == Looper.getMainLooper();
   }
 
   //endregion
@@ -193,9 +215,9 @@ public class Console extends FrameLayout {
 
   void writeInternal(Object o) {
     if (o == null) {
-      appendText("null");
+      appendTextInternal("null");
     } else {
-      appendText(o.toString());
+      appendTextInternal(o.toString());
     }
   }
 
@@ -211,7 +233,7 @@ public class Console extends FrameLayout {
     _text.setText("");
   }
 
-  void appendText(String text) {
+  void appendTextInternal(String text) {
     if (text == null) {
       throw new IllegalArgumentException("text cannot be null");
     }
@@ -225,11 +247,17 @@ public class Console extends FrameLayout {
   }
 
   void appendLine(String line) {
-    appendText(line);
-    appendText(END_LINE);
+    appendTextInternal(line);
+    appendTextInternal(END_LINE);
   }
 
   private static void performAction(ConsoleAction action) {
+    if (!isUIThread()) {
+      PerformActionRunnable actionRunnable = new PerformActionRunnable(action);
+      getUIThreadHandler().post(actionRunnable);
+      return;
+    }
+
     // iteration from the end to allow in place removing
     for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
       WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
@@ -295,6 +323,19 @@ public class Console extends FrameLayout {
 
     @Override public void run() {
       _scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+  }
+
+  static class PerformActionRunnable implements Runnable {
+    private final ConsoleAction _consoleAction;
+
+    private PerformActionRunnable(ConsoleAction consoleAction) {
+      _consoleAction = consoleAction;
+    }
+
+    @Override
+    public void run() {
+      performAction(_consoleAction);
     }
   }
 
