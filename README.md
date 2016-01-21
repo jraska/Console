@@ -32,7 +32,7 @@ Console.clear();
 
 Grab via Gradle: 
 ```groovy
-compile 'com.jraska:console:0.1.1'
+compile 'com.jraska:console:0.2.0'
 ```
 
 ## License
