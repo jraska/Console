@@ -29,6 +29,9 @@ import java.util.List;
 public class Console extends FrameLayout {
   //region Constants
 
+  // TODO: 16/02/16 Make this configurable - probably something like Console.Settings
+  private static final int DEFAULT_MAX_BUFFER_SIZE = 8_000;
+
   static final String END_LINE = "\n";
   static final String REMOVING_UNSUPPORTED_MESSAGE
       = "Removing of Views is unsupported in " + Console.class;
@@ -77,6 +80,8 @@ public class Console extends FrameLayout {
   private static final Object __lock = new Object();
 
   private TextView _text;
+  private StringBuilder _buffer = new StringBuilder(500);
+  private int _maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
 
   // This will serve as flag for all view modifying methods
   // of Console to be suppressed from outside
@@ -129,12 +134,21 @@ public class Console extends FrameLayout {
   //region Properties
 
   String getConsoleText() {
-    CharSequence text = _text.getText();
-    if (text == null) {
-      return "";
-    }
+    return _buffer.toString();
+  }
 
-    return text.toString();
+  int getMaxBufferSize() {
+    return _maxBufferSize;
+  }
+
+  void setMaxBufferSize(int maxBufferSize) {
+    boolean bufferChange = maxBufferSize < _maxBufferSize;
+    _maxBufferSize = maxBufferSize;
+
+    if (bufferChange) {
+      ensureMaxBufferSize();
+      printBuffer();
+    }
   }
 
   private static Handler getUIThreadHandler() {
@@ -230,7 +244,8 @@ public class Console extends FrameLayout {
   }
 
   void clearInternal() {
-    _text.setText("");
+    _buffer.setLength(0);
+    printBuffer();
   }
 
   void appendTextInternal(String text) {
@@ -238,11 +253,27 @@ public class Console extends FrameLayout {
       throw new IllegalArgumentException("text cannot be null");
     }
 
-    _text.append(text);
+    _buffer.append(text);
+    ensureMaxBufferSize();
+    printBuffer();
+    scrollDown();
+  }
 
+  private void printBuffer() {
+    _text.setText(_buffer.toString());
+  }
+
+  private void scrollDown() {
     if (!_fullScrollScheduled) {
       post(_scrollDownRunnable);
       _fullScrollScheduled = true;
+    }
+  }
+
+  private void ensureMaxBufferSize() {
+    if (_buffer.length() > _maxBufferSize) {
+      int requiredReplacedCharacters = _buffer.length() - _maxBufferSize;
+      _buffer.replace(0, requiredReplacedCharacters, "");
     }
   }
 

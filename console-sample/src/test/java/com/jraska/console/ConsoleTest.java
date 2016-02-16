@@ -9,11 +9,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -47,7 +43,7 @@ public class ConsoleTest {
     String testText = "asd5a6das7";
     Console.write(testText);
 
-    assertThat(_console.getConsoleText(), containsString(testText));
+    assertThat(_console.getConsoleText()).contains(testText);
   }
 
   @Test
@@ -55,8 +51,8 @@ public class ConsoleTest {
     String testText = "657ad52jh";
     Console.writeLine(testText);
 
-    assertThat(_console.getConsoleText(), containsString(testText));
-    assertThat(_console.getConsoleText(), containsString(Console.END_LINE));
+    assertThat(_console.getConsoleText()).contains(testText);
+    assertThat(_console.getConsoleText()).contains(Console.END_LINE);
   }
 
   @Test
@@ -65,7 +61,31 @@ public class ConsoleTest {
 
     Console.clear();
 
-    assertThat(_console.getConsoleText(), equalTo(""));
+    assertThat(_console.getConsoleText()).isEqualTo("");
+  }
+
+  @Test
+  public void whenTextLongerThenBufferSize_printedTextIsShortened() throws Exception {
+    _console.setMaxBufferSize(5);
+
+    Console.write("123456789");
+
+    assertThat(_console.getConsoleText()).isEqualTo("56789");
+
+    for (int i = 0; i < 5; i++) {
+      Console.writeLine("");
+    }
+
+    assertThat(_console.getConsoleText()).isEqualTo("\n\n\n\n\n");
+  }
+
+  @Test
+  public void testWhenBufferSizeChanes_textIsShortened() throws Exception {
+    Console.write("123456789");
+
+    _console.setMaxBufferSize(6);
+
+    assertThat(_console.getConsoleText()).isEqualTo("456789");
   }
 
   @Test
