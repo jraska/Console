@@ -112,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
       sleep(time);
       Console.writeLine("Message from async task after " + time + " ms");
       sleep(time);
-      Console.write("Console will be cleared in next " + time + " ms");
+      Console.write("Another Message from async tak new line in " + time + " ms");
       sleep(time);
-      Console.clear();
+      Console.writeLine();
 
       return null;
     }

@@ -40,6 +40,10 @@ public class Console extends FrameLayout {
 
   //region Public Static API
 
+  public static void writeLine() {
+    writeLine("");
+  }
+
   /**
    * Write provided object String representation to console and starts new line
    * "null" is written if the object is null
@@ -90,6 +94,8 @@ public class Console extends FrameLayout {
   // Fields is used to not schedule more than one runnable for scroll down
   private boolean _fullScrollScheduled;
   private Runnable _scrollDownRunnable;
+  private UserTouchingListener _userTouchingListener;
+  private FlingProperty _flingProperty;
 
   //endregion
 
@@ -127,6 +133,9 @@ public class Console extends FrameLayout {
 
     ScrollView scrollView = findViewByIdSafe(R.id.console_scroll_view);
     _scrollDownRunnable = new ScrollDownRunnable(scrollView);
+    _flingProperty = FlingProperty.create(scrollView);
+    _userTouchingListener = new UserTouchingListener();
+    scrollView.setOnTouchListener(_userTouchingListener);
   }
 
   //endregion
@@ -149,6 +158,10 @@ public class Console extends FrameLayout {
       ensureMaxBufferSize();
       printBuffer();
     }
+  }
+
+  boolean isUserInteracting() {
+    return _userTouchingListener.isUserTouching() | _flingProperty.isFlinging();
   }
 
   private static Handler getUIThreadHandler() {
@@ -264,7 +277,7 @@ public class Console extends FrameLayout {
   }
 
   private void scrollDown() {
-    if (!_fullScrollScheduled) {
+    if (!isUserInteracting() && !_fullScrollScheduled) {
       post(_scrollDownRunnable);
       _fullScrollScheduled = true;
     }
