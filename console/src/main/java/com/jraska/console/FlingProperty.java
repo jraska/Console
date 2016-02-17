@@ -23,7 +23,7 @@ class FlingProperty {
     try {
       return createUnchecked(scrollView);
     }
-    // catching generic exception is se as workaround to reflective exception changes on API changes
+    // catching generic exception as workaround to reflective exception changes on API changes
     catch (Exception e) {
       throw new RuntimeException(e);
     }
