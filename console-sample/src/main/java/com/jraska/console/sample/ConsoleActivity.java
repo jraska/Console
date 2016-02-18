@@ -14,7 +14,7 @@ import com.jraska.console.Console;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class ConsoleActivity extends AppCompatActivity {
 
   //region Constants
 

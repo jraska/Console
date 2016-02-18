@@ -10,7 +10,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
-    tools:context=".MainActivity">
+    tools:context=".ConsoleActivity">
 
     <com.jraska.console.Console
         android:layout_width="match_parent"
