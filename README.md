@@ -32,7 +32,24 @@ Console.clear();
 
 Grab via Gradle: 
 ```groovy
-compile 'com.jraska:console:0.2.0'
+compile 'com.jraska:console:0.3.0'
+```
+
+## Timber Tree
+For easy integration with [Timber]
+
+### Usage
+```java
+// In your Application or wherever you register your trees
+Timber.plant(new ConsoleTree());
+
+// This will be written to your console in app
+Timber.d("Hello Console")
+```
+
+### Gradle: 
+```groovy
+compile 'com.jraska:console-timber-tree:0.3.0'
 ```
 
 ## License
@@ -50,3 +67,5 @@ compile 'com.jraska:console:0.2.0'
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+[Timber]: https://github.com/JakeWharton/timber
