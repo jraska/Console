@@ -1,1 +1,1 @@
-include ':console-sample', ':console'
+include ':console-sample', ':console', ':console-timber-tree'
