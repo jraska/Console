@@ -45,7 +45,7 @@ public class ConsoleActivity extends AppCompatActivity {
     Console.write(savedInstanceState);
     Console.writeLine(")");
 
-    Timber.i("Timber info onCreate(%s)", savedInstanceState);
+    Timber.i("Timber info", savedInstanceState);
   }
 
   @Override
@@ -53,14 +53,14 @@ public class ConsoleActivity extends AppCompatActivity {
     super.onStart();
 
     Console.writeLine(currentTime() + " onStart()");
-    Timber.d("Timber debug onStart()");
+    Timber.d("Timber debug");
   }
 
   @Override protected void onResume() {
     super.onResume();
 
     Console.writeLine(currentTime() + " onResume()");
-    Timber.w("Timber warn onResume()");
+    Timber.w("Timber warning");
   }
 
   @Override
