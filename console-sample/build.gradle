@@ -34,6 +34,7 @@ android {
 
 dependencies {
   compile project(':console')
+  compile project(':console-timber-tree')
 
   compile 'com.android.support:appcompat-v7:23.1.1'
   compile 'com.android.support:design:23.1.1'

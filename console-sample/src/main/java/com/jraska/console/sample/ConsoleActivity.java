@@ -10,6 +10,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.jraska.console.Console;
+import timber.log.Timber;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -43,6 +44,8 @@ public class ConsoleActivity extends AppCompatActivity {
     Console.write(currentTime() + " onCreate(");
     Console.write(savedInstanceState);
     Console.writeLine(")");
+
+    Timber.i("Timber info onCreate(%s)", savedInstanceState);
   }
 
   @Override
@@ -50,12 +53,14 @@ public class ConsoleActivity extends AppCompatActivity {
     super.onStart();
 
     Console.writeLine(currentTime() + " onStart()");
+    Timber.d("Timber debug onStart()");
   }
 
   @Override protected void onResume() {
     super.onResume();
 
     Console.writeLine(currentTime() + " onResume()");
+    Timber.w("Timber warn onResume()");
   }
 
   @Override

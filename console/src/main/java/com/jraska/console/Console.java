@@ -30,7 +30,7 @@ public class Console extends FrameLayout {
   //region Constants
 
   // TODO: 16/02/16 Make this configurable - probably something like Console.Settings
-  private static final int DEFAULT_MAX_BUFFER_SIZE = 8_000;
+  private static final int DEFAULT_MAX_BUFFER_SIZE = 16_000;
 
   static final String END_LINE = "\n";
   static final String REMOVING_UNSUPPORTED_MESSAGE
