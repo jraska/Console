@@ -45,7 +45,7 @@ public class ConsoleActivity extends AppCompatActivity {
     Console.write(savedInstanceState);
     Console.writeLine(")");
 
-    Timber.i("Timber info", savedInstanceState);
+    Timber.i("Timber info");
   }
 
   @Override
