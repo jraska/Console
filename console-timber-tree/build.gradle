@@ -28,3 +28,30 @@ dependencies {
 
   compile project(":console")
 }
+
+ext {
+  bintrayRepo = 'maven'
+  bintrayName = 'com.jraska:console-timber-tree'
+
+  publishedGroupId = 'com.jraska'
+  libraryName = 'Console'
+  artifact = 'console-timber-tree'
+
+  libraryDescription = 'Timber tree publishing to console'
+
+  siteUrl = 'https://github.com/jraska/Console'
+  gitUrl = 'https://github.com/jraska/Console.git'
+
+  libraryVersion = version
+
+  developerId = 'jraska'
+  developerName = 'Josef Raska'
+  developerEmail = 'josef.raska@gmail.com'
+
+  licenseName = 'The Apache Software License, Version 2.0'
+  licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  allLicenses = ["Apache-2.0"]
+}
+
+apply from: rootDir.absolutePath + '/gradle/installv1.gradle'
+apply from: rootDir.absolutePath + '/gradle/bintrayv1.gradle'
