@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Console Sample</string>
-    <string name="action_settings">Settings</string>
     <string name="action_console_clear">Clear Console</string>
     <string name="action_console_async">Async</string>
 </resources>
