@@ -7,7 +7,7 @@ import timber.log.Timber;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConsoleTree extends Timber.Tree {
+public final class ConsoleTree extends Timber.Tree {
 
   //region Constants
 
@@ -19,16 +19,16 @@ public class ConsoleTree extends Timber.Tree {
   //region Tree impl
 
   @Override
-  protected void log(int priority, String tag, String message, Throwable t) {
+  protected final void log(int priority, String tag, String message, Throwable t) {
     if (tag == null) {
       tag = getTag();
     }
 
     String consoleMessage;
     if (tag == null) {
-      consoleMessage = String.format("%s: %s", priorityString(priority), message);
+      consoleMessage = String.format("%s: %s", toPriorityString(priority), message);
     } else {
-      consoleMessage = String.format("%s/%s: %s", priorityString(priority), tag, message);
+      consoleMessage = String.format("%s/%s: %s", toPriorityString(priority), tag, message);
     }
 
     writeToConsole(consoleMessage);
@@ -42,7 +42,7 @@ public class ConsoleTree extends Timber.Tree {
     Console.writeLine(consoleMessage);
   }
 
-  protected String createStackElementTag(StackTraceElement element) {
+  String createStackElementTag(StackTraceElement element) {
     String tag = element.getClassName();
     Matcher matcher = ANONYMOUS_CLASS.matcher(tag);
     if (matcher.find()) {
@@ -52,7 +52,7 @@ public class ConsoleTree extends Timber.Tree {
     return tag.substring(tag.lastIndexOf('.') + 1);
   }
 
-  protected String getTag() {
+  String getTag() {
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
     if (stackTrace.length <= CALL_STACK_INDEX) {
       return null;
@@ -60,7 +60,7 @@ public class ConsoleTree extends Timber.Tree {
     return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
   }
 
-  private static String priorityString(int priority) {
+  protected String toPriorityString(int priority) {
     switch (priority) {
       case Log.ASSERT:
         return "WTF";

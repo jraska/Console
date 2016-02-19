@@ -32,7 +32,7 @@ Console.clear();
 
 Grab via Gradle: 
 ```groovy
-compile 'com.jraska:console:0.3.0'
+compile 'com.jraska:console:0.3.1'
 ```
 
 ## Timber Tree
@@ -49,7 +49,7 @@ Timber.d("Hello Console")
 
 ### Gradle: 
 ```groovy
-compile 'com.jraska:console-timber-tree:0.3.0'
+compile 'com.jraska:console-timber-tree:0.3.1'
 ```
 
 ## License
