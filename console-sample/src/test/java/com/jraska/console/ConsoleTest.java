@@ -2,12 +2,15 @@ package com.jraska.console;
 
 import android.content.Context;
 import android.view.View;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.lang.ref.WeakReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
@@ -30,8 +33,15 @@ public class ConsoleTest {
   //region Setup methods
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     _console = new Console(getAppContext());
+  }
+
+  @After
+  public void tearDown() {
+    Console.setMaxBufferSize(Console.MAX_BUFFER_SIZE);
+    Console.clear();
+    Console._consoles.clear();
   }
 
   //endregion
@@ -66,7 +76,7 @@ public class ConsoleTest {
 
   @Test
   public void whenTextLongerThenBufferSize_printedTextIsShortened() throws Exception {
-    _console.setMaxBufferSize(5);
+    Console.setMaxBufferSize(5);
 
     Console.write("123456789");
 
@@ -83,7 +93,7 @@ public class ConsoleTest {
   public void testWhenBufferSizeChanes_textIsShortened() throws Exception {
     Console.write("123456789");
 
-    _console.setMaxBufferSize(6);
+    Console.setMaxBufferSize(6);
 
     assertThat(_console.getConsoleText()).isEqualTo("456789");
   }
@@ -91,11 +101,21 @@ public class ConsoleTest {
   @Test
   public void testScrollDownScheduledOnlyOnceOnMultiWrite() throws Exception {
     Console consoleSpy = spy(_console);
+    Console._consoles.set(0, new WeakReference<>(consoleSpy));
+    consoleSpy.measure(0, 0); // simpulate next frame
 
-    consoleSpy.writeInternal("someText");
-    consoleSpy.writeLineInternal("line");
+    Console.write("someText");
+    Console.write("line");
 
     verify(consoleSpy, times(1)).post(isA(Console.ScrollDownRunnable.class));
+  }
+
+  @Test
+  public void whenNewConsoleViewCreated_thenBufferIsPrinted() throws Exception {
+    Console.write("text");
+
+    Console newConsole = new Console(getAppContext());
+    assertThat(newConsole.getConsoleText()).isEqualTo("text");
   }
 
   //region View methods failures tests

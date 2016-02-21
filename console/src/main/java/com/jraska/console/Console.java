@@ -30,7 +30,7 @@ public class Console extends FrameLayout {
   //region Constants
 
   // TODO: 16/02/16 Make this configurable - probably something like Console.Settings
-  private static final int DEFAULT_MAX_BUFFER_SIZE = 16_000;
+  static final int MAX_BUFFER_SIZE = 16_000;
 
   static final String END_LINE = "\n";
   static final String REMOVING_UNSUPPORTED_MESSAGE
@@ -51,8 +51,13 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void writeLine(Object o) {
-    WriteLine writeLine = new WriteLine(o);
-    performAction(writeLine);
+    if (o == null) {
+      appendLine("null");
+    } else {
+      appendLine(o.toString());
+    }
+
+    scheduleConsolePrint();
   }
 
   /**
@@ -62,15 +67,21 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void write(Object o) {
-    Write write = new Write(o);
-    performAction(write);
+    if (o == null) {
+      appendTextInternal("null");
+    } else {
+      appendTextInternal(o.toString());
+    }
+
+    scheduleConsolePrint();
   }
 
   /**
    * Clears the console text
    */
   public static void clear() {
-    performAction(Clear.INSTANCE);
+    __buffer.setLength(0);
+    scheduleConsolePrint();
   }
 
   public static int consoleViewsCount() {
@@ -81,15 +92,16 @@ public class Console extends FrameLayout {
 
   //region Fields
 
-  private static List<WeakReference<Console>> _consoles = new ArrayList<>();
+  static List<WeakReference<Console>> _consoles = new ArrayList<>();
+  static StringBuffer __buffer = new StringBuffer(500);
+  static int __maxBufferSize = MAX_BUFFER_SIZE;
 
   // Handler for case writing is called from wrong thread
   private static volatile Handler __uiThreadHandler;
   private static final Object __lock = new Object();
 
   private TextView _text;
-  private StringBuilder _buffer = new StringBuilder(500);
-  private int _maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
+  private ScrollView _scrollView;
 
   // This will serve as flag for all view modifying methods
   // of Console to be suppressed from outside
@@ -98,6 +110,7 @@ public class Console extends FrameLayout {
   // Fields is used to not schedule more than one runnable for scroll down
   private boolean _fullScrollScheduled;
   private Runnable _scrollDownRunnable;
+
   private UserTouchingListener _userTouchingListener;
   private FlingProperty _flingProperty;
 
@@ -135,11 +148,19 @@ public class Console extends FrameLayout {
 
     _text = findViewByIdSafe(R.id.console_text);
 
-    ScrollView scrollView = findViewByIdSafe(R.id.console_scroll_view);
-    _scrollDownRunnable = new ScrollDownRunnable(scrollView);
-    _flingProperty = FlingProperty.create(scrollView);
+    _scrollView = findViewByIdSafe(R.id.console_scroll_view);
+    _scrollDownRunnable = new ScrollDownRunnable(this);
+    _flingProperty = FlingProperty.create(_scrollView);
     _userTouchingListener = new UserTouchingListener();
-    scrollView.setOnTouchListener(_userTouchingListener);
+    _scrollView.setOnTouchListener(_userTouchingListener);
+
+    printBuffer();
+    // need to have extra post here, because scroll view is fully initialized after another post
+    post(new Runnable() {
+      @Override public void run() {
+        scrollDown();
+      }
+    });
   }
 
   //endregion
@@ -147,37 +168,31 @@ public class Console extends FrameLayout {
   //region Properties
 
   String getConsoleText() {
-    return _buffer.toString();
-  }
-
-  int getMaxBufferSize() {
-    return _maxBufferSize;
-  }
-
-  void setMaxBufferSize(int maxBufferSize) {
-    boolean bufferChange = maxBufferSize < _maxBufferSize;
-    _maxBufferSize = maxBufferSize;
-
-    if (bufferChange) {
-      ensureMaxBufferSize();
-      printBuffer();
-    }
+    return _text.getText().toString();
   }
 
   boolean isUserInteracting() {
-    return _userTouchingListener.isUserTouching() | _flingProperty.isFlinging();
+    return _userTouchingListener.isUserTouching() || _flingProperty.isFlinging();
+  }
+
+  static void setMaxBufferSize(int maxBufferSize) {
+    boolean bufferChange = maxBufferSize < __maxBufferSize;
+    __maxBufferSize = maxBufferSize;
+
+    if (bufferChange) {
+      ensureMaxBufferSize();
+      scheduleConsolePrint();
+    }
   }
 
   private static Handler getUIThreadHandler() {
-    if (__uiThreadHandler == null) {
-      synchronized (__lock) {
-        if (__uiThreadHandler == null) {
-          __uiThreadHandler = new Handler(Looper.getMainLooper());
-        }
+    synchronized (__lock) {
+      if (__uiThreadHandler == null) {
+        __uiThreadHandler = new Handler(Looper.getMainLooper());
       }
-    }
 
-    return __uiThreadHandler;
+      return __uiThreadHandler;
+    }
   }
 
   private static boolean isUIThread() {
@@ -244,40 +259,13 @@ public class Console extends FrameLayout {
 
   //region Methods
 
-  void writeInternal(Object o) {
-    if (o == null) {
-      appendTextInternal("null");
-    } else {
-      appendTextInternal(o.toString());
-    }
-  }
-
-  void writeLineInternal(Object o) {
-    if (o == null) {
-      appendLine("null");
-    } else {
-      appendLine(o.toString());
-    }
-  }
-
-  void clearInternal() {
-    _buffer.setLength(0);
-    printBuffer();
-  }
-
-  void appendTextInternal(String text) {
-    if (text == null) {
-      throw new IllegalArgumentException("text cannot be null");
-    }
-
-    _buffer.append(text);
-    ensureMaxBufferSize();
+  private void printScroll() {
     printBuffer();
     scrollDown();
   }
 
   private void printBuffer() {
-    _text.setText(_buffer.toString());
+    _text.setText(__buffer.toString());
   }
 
   private void scrollDown() {
@@ -287,35 +275,34 @@ public class Console extends FrameLayout {
     }
   }
 
-  private void ensureMaxBufferSize() {
-    if (_buffer.length() > _maxBufferSize) {
-      int requiredReplacedCharacters = _buffer.length() - _maxBufferSize;
-      _buffer.replace(0, requiredReplacedCharacters, "");
+  private void scrollFullDown() {
+    _scrollView.fullScroll(View.FOCUS_DOWN);
+  }
+
+  private static void scheduleConsolePrint() {
+    performAction(PrintBufferOnTextChanged.INSTANCE);
+  }
+
+  static void appendTextInternal(String text) {
+    if (text == null) {
+      throw new IllegalArgumentException("text cannot be null");
+    }
+
+    __buffer.append(text);
+    ensureMaxBufferSize();
+    scheduleConsolePrint();
+  }
+
+  private static void ensureMaxBufferSize() {
+    if (__buffer.length() > __maxBufferSize) {
+      int requiredReplacedCharacters = __buffer.length() - __maxBufferSize;
+      __buffer.replace(0, requiredReplacedCharacters, "");
     }
   }
 
-  void appendLine(String line) {
+  static void appendLine(String line) {
     appendTextInternal(line);
     appendTextInternal(END_LINE);
-  }
-
-  private static void performAction(ConsoleAction action) {
-    if (!isUIThread()) {
-      PerformActionRunnable actionRunnable = new PerformActionRunnable(action);
-      getUIThreadHandler().post(actionRunnable);
-      return;
-    }
-
-    // iteration from the end to allow in place removing
-    for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
-      WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
-      Console console = consoleReference.get();
-      if (console == null) {
-        _consoles.remove(consoleIndex);
-      } else {
-        action.perform(console);
-      }
-    }
   }
 
   /**
@@ -355,22 +342,41 @@ public class Console extends FrameLayout {
     }
   }
 
+  private static void performAction(ConsoleAction action) {
+    if (!isUIThread()) {
+      PerformActionRunnable actionRunnable = new PerformActionRunnable(action);
+      getUIThreadHandler().post(actionRunnable);
+      return;
+    }
+
+    // iteration from the end to allow in place removing
+    for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
+      WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
+      Console console = consoleReference.get();
+      if (console == null) {
+        _consoles.remove(consoleIndex);
+      } else {
+        action.perform(console);
+      }
+    }
+  }
+
   //endregion
 
   //region Nested classes
 
   static class ScrollDownRunnable implements Runnable {
-    private final ScrollView _scrollView;
+    private final Console _console;
 
-    ScrollDownRunnable(ScrollView scrollView) {
-      if (scrollView == null) {
+    ScrollDownRunnable(Console console) {
+      if (console == null) {
         throw new IllegalArgumentException("scrollView cannot be null");
       }
-      _scrollView = scrollView;
+      _console = console;
     }
 
     @Override public void run() {
-      _scrollView.fullScroll(View.FOCUS_DOWN);
+      _console.scrollFullDown();
     }
   }
 
@@ -395,35 +401,11 @@ public class Console extends FrameLayout {
     void perform(Console console);
   }
 
-  static final class Clear implements ConsoleAction {
-    static final Clear INSTANCE = new Clear();
+  static final class PrintBufferOnTextChanged implements ConsoleAction {
+    static final PrintBufferOnTextChanged INSTANCE = new PrintBufferOnTextChanged();
 
     @Override public void perform(Console console) {
-      console.clearInternal();
-    }
-  }
-
-  static final class WriteLine implements ConsoleAction {
-    private final Object _value;
-
-    public WriteLine(Object value) {
-      _value = value;
-    }
-
-    @Override public void perform(Console console) {
-      console.writeLineInternal(_value);
-    }
-  }
-
-  static final class Write implements ConsoleAction {
-    private final Object _value;
-
-    public Write(Object value) {
-      _value = value;
-    }
-
-    @Override public void perform(Console console) {
-      console.writeInternal(_value);
+      console.printScroll();
     }
   }
 
