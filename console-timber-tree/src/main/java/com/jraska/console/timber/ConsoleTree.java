@@ -19,6 +19,11 @@ public final class ConsoleTree extends Timber.Tree {
   //region Tree impl
 
   @Override
+  protected boolean isLoggable(int priority) {
+    return Console.consoleViewsCount() >= 1 && super.isLoggable(priority);
+  }
+
+  @Override
   protected final void log(int priority, String tag, String message, Throwable t) {
     if (tag == null) {
       tag = getTag();

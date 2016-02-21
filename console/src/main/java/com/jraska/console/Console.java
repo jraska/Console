@@ -73,6 +73,10 @@ public class Console extends FrameLayout {
     performAction(Clear.INSTANCE);
   }
 
+  public static int consoleViewsCount() {
+    return _consoles.size();
+  }
+
   //endregion
 
   //region Fields
