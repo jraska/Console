@@ -16,11 +16,29 @@ public final class ConsoleTree extends Timber.Tree {
 
   //endregion
 
+  //region Fields
+
+  private final int _minPriority;
+
+  //endregion
+
+  //region Constructors
+
+  public ConsoleTree() {
+    this(Log.VERBOSE);
+  }
+
+  public ConsoleTree(int minPriority) {
+    _minPriority = minPriority;
+  }
+
+  //endregion
+
   //region Tree impl
 
   @Override
   protected boolean isLoggable(int priority) {
-    return Console.consoleViewsCount() >= 1 && super.isLoggable(priority);
+    return priority >= _minPriority && Console.consoleViewsCount() >= 1;
   }
 
   @Override
