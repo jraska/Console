@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 /**
  * Utility using reflection to pull up OverScroller and then use it as fling indicator.
  */
-class FlingProperty {
+final class FlingProperty {
   private final OverScroller _overScroller;
 
   private FlingProperty(OverScroller overScroller) {

@@ -3,7 +3,7 @@ package com.jraska.console;
 import android.view.MotionEvent;
 import android.view.View;
 
-class UserTouchingListener implements View.OnTouchListener {
+final class UserTouchingListener implements View.OnTouchListener {
   private boolean _userHolds;
 
   boolean isUserTouching() {
