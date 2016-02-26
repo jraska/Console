@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unused_string">Only to make Robolectric run</string>
+</resources>

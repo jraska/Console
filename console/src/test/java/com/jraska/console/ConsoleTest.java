@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -14,9 +15,7 @@ import java.lang.ref.WeakReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * Test is moved here from console library module to enable Robolectric testing
@@ -101,7 +100,7 @@ public class ConsoleTest {
 
   @Test
   public void testScrollDownScheduledOnlyOnceOnMultiWrite() throws Exception {
-    Console consoleSpy = spy(_console);
+    Console consoleSpy = Mockito.spy(_console);
     Console._consoles.set(0, new WeakReference<>(consoleSpy));
     consoleSpy.measure(0, 0); // simulate next frame
 
