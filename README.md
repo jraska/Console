@@ -1,5 +1,5 @@
 # Console
-Android console implementation allows static console calls to easy debug your application without memory leaks.
+An Android console view, which allows you to log text using static calls, to easily debug your application, whilst avoiding memory leaks.
 
 [![Build Status](https://travis-ci.org/jraska/Console.svg)](https://travis-ci.org/jraska/Console)
 [![Sample](https://img.shields.io/badge/Download-Sample-blue.svg)](https://drive.google.com/file/d/0B0T1YjC17C-rTDBWNDBaSWVhcjg/view?usp=sharing)
@@ -36,14 +36,14 @@ compile 'com.jraska:console:0.3.1'
 ```
 
 ## Timber Tree
-For easy integration with [Timber]
+To allow easy integration with [Timber]
 
 ### Usage
 ```java
 // In your Application or wherever you register your trees
 Timber.plant(new ConsoleTree());
 
-// This will be written to your console in app
+// This will be written to your in-app console view
 Timber.d("Hello Console")
 ```
 
