@@ -90,7 +90,11 @@ public class Console extends ConsoleAncestorLayout {
 
   // Fields are used to not schedule more than one runnable for scroll down
   private boolean _fullScrollScheduled;
-  private Runnable _scrollDownRunnable;
+  private final Runnable _scrollDownRunnable = new Runnable() {
+    @Override public void run() {
+      scrollFullDown();
+    }
+  };
 
   private UserTouchingListener _userTouchingListener;
   private FlingProperty _flingProperty;
@@ -130,7 +134,6 @@ public class Console extends ConsoleAncestorLayout {
     _text = findViewByIdSafe(R.id.console_text);
 
     _scrollView = findViewByIdSafe(R.id.console_scroll_view);
-    _scrollDownRunnable = new ScrollDownRunnable(this);
     _flingProperty = FlingProperty.create(_scrollView);
     _userTouchingListener = new UserTouchingListener();
     _scrollView.setOnTouchListener(_userTouchingListener);
@@ -215,10 +218,6 @@ public class Console extends ConsoleAncestorLayout {
     _scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
-  static void scheduleBufferPrint() {
-    performAction(PrintBufferOnTextChanged.INSTANCE);
-  }
-
   /**
    * Throws exception if the view is not found
    *
@@ -256,10 +255,13 @@ public class Console extends ConsoleAncestorLayout {
     }
   }
 
-  private static void performAction(ConsoleAction action) {
+  static void scheduleBufferPrint() {
+    runBufferPrint();
+  }
+
+  private static void runBufferPrint() {
     if (!isUIThread()) {
-      PerformActionRunnable actionRunnable = new PerformActionRunnable(action);
-      getUIThreadHandler().post(actionRunnable);
+      getUIThreadHandler().post(BufferPrintRunnable.INSTANCE);
       return;
     }
 
@@ -270,7 +272,7 @@ public class Console extends ConsoleAncestorLayout {
       if (console == null) {
         _consoles.remove(consoleIndex);
       } else {
-        action.perform(console);
+        console.printScroll();
       }
     }
   }
@@ -279,47 +281,12 @@ public class Console extends ConsoleAncestorLayout {
 
   //region Nested classes
 
-  static class ScrollDownRunnable implements Runnable {
-    private final Console _console;
-
-    ScrollDownRunnable(Console console) {
-      if (console == null) {
-        throw new IllegalArgumentException("scrollView cannot be null");
-      }
-      _console = console;
-    }
-
-    @Override public void run() {
-      _console.scrollFullDown();
-    }
-  }
-
-  static class PerformActionRunnable implements Runnable {
-    private final ConsoleAction _consoleAction;
-
-    private PerformActionRunnable(ConsoleAction consoleAction) {
-      _consoleAction = consoleAction;
-    }
+  static class BufferPrintRunnable implements Runnable {
+    private static final BufferPrintRunnable INSTANCE = new BufferPrintRunnable();
 
     @Override
     public void run() {
-      performAction(_consoleAction);
-    }
-  }
-
-  /**
-   * This abstraction is here to have only one implementation of consoles
-   * traversing and removing already released references.
-   */
-  interface ConsoleAction {
-    void perform(Console console);
-  }
-
-  static final class PrintBufferOnTextChanged implements ConsoleAction {
-    static final PrintBufferOnTextChanged INSTANCE = new PrintBufferOnTextChanged();
-
-    @Override public void perform(Console console) {
-      console.printScroll();
+      runBufferPrint();
     }
   }
 

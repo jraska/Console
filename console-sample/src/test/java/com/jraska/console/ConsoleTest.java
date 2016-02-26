@@ -103,12 +103,12 @@ public class ConsoleTest {
   public void testScrollDownScheduledOnlyOnceOnMultiWrite() throws Exception {
     Console consoleSpy = spy(_console);
     Console._consoles.set(0, new WeakReference<>(consoleSpy));
-    consoleSpy.measure(0, 0); // simpulate next frame
+    consoleSpy.measure(0, 0); // simulate next frame
 
     Console.write("someText");
     Console.write("line");
 
-    verify(consoleSpy, times(1)).post(isA(Console.ScrollDownRunnable.class));
+    verify(consoleSpy).post(isA(Runnable.class));
   }
 
   @Test
