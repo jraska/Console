@@ -39,7 +39,7 @@ public class ConsoleTest {
 
   @After
   public void tearDown() {
-    Console.setMaxBufferSize(Console.MAX_BUFFER_SIZE);
+    Console.__buffer.setSize(ConsoleBuffer.MAX_BUFFER_SIZE);
     Console.clear();
     Console._consoles.clear();
   }
@@ -76,7 +76,7 @@ public class ConsoleTest {
 
   @Test
   public void whenTextLongerThenBufferSize_printedTextIsShortened() throws Exception {
-    Console.setMaxBufferSize(5);
+    Console.__buffer.setSize(5);
 
     Console.write("123456789");
 
@@ -90,10 +90,11 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testWhenBufferSizeChanes_textIsShortened() throws Exception {
+  public void testWhenBufferSizeChanges_textIsShortened() throws Exception {
     Console.write("123456789");
 
-    Console.setMaxBufferSize(6);
+    Console.__buffer.setSize(6);
+    Console.scheduleBufferPrint();
 
     assertThat(_console.getConsoleText()).isEqualTo("456789");
   }

@@ -17,7 +17,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Console like output view, which allows writing via static console methods
  * from anywhere of application.
@@ -27,9 +26,6 @@ import java.util.List;
 public class Console extends ConsoleAncestorLayout {
   //region Constants
 
-  // TODO: 16/02/16 Make this configurable - probably something like Console.Settings
-  static final int MAX_BUFFER_SIZE = 16_000;
-
   static final String END_LINE = "\n";
 
   //endregion
@@ -37,7 +33,7 @@ public class Console extends ConsoleAncestorLayout {
   //region Public Static API
 
   public static void writeLine() {
-    writeLine("");
+    write(END_LINE);
   }
 
   /**
@@ -47,13 +43,8 @@ public class Console extends ConsoleAncestorLayout {
    * @param o Object to write
    */
   public static void writeLine(Object o) {
-    if (o == null) {
-      appendLine("null");
-    } else {
-      appendLine(o.toString());
-    }
-
-    scheduleConsolePrint();
+    __buffer.append(o).append(END_LINE);
+    scheduleBufferPrint();
   }
 
   /**
@@ -63,21 +54,16 @@ public class Console extends ConsoleAncestorLayout {
    * @param o Object to write
    */
   public static void write(Object o) {
-    if (o == null) {
-      appendTextInternal("null");
-    } else {
-      appendTextInternal(o.toString());
-    }
-
-    scheduleConsolePrint();
+    __buffer.append(o);
+    scheduleBufferPrint();
   }
 
   /**
    * Clears the console text
    */
   public static void clear() {
-    __buffer.setLength(0);
-    scheduleConsolePrint();
+    __buffer.clear();
+    scheduleBufferPrint();
   }
 
   public static int consoleViewsCount() {
@@ -89,8 +75,7 @@ public class Console extends ConsoleAncestorLayout {
   //region Fields
 
   static List<WeakReference<Console>> _consoles = new ArrayList<>();
-  static StringBuffer __buffer = new StringBuffer(500);
-  static int __maxBufferSize = MAX_BUFFER_SIZE;
+  static ConsoleBuffer __buffer = new ConsoleBuffer(500);
 
   // Handler for case writing is called from wrong thread
   private static volatile Handler __uiThreadHandler;
@@ -171,16 +156,6 @@ public class Console extends ConsoleAncestorLayout {
     return _userTouchingListener.isUserTouching() || _flingProperty.isFlinging();
   }
 
-  static void setMaxBufferSize(int maxBufferSize) {
-    boolean bufferChange = maxBufferSize < __maxBufferSize;
-    __maxBufferSize = maxBufferSize;
-
-    if (bufferChange) {
-      ensureMaxBufferSize();
-      scheduleConsolePrint();
-    }
-  }
-
   private static Handler getUIThreadHandler() {
     synchronized (__lock) {
       if (__uiThreadHandler == null) {
@@ -226,7 +201,7 @@ public class Console extends ConsoleAncestorLayout {
   }
 
   private void printBuffer() {
-    _text.setText(__buffer.toString());
+    _text.setText(__buffer.getText());
   }
 
   private void scrollDown() {
@@ -240,30 +215,8 @@ public class Console extends ConsoleAncestorLayout {
     _scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
-  private static void scheduleConsolePrint() {
+  static void scheduleBufferPrint() {
     performAction(PrintBufferOnTextChanged.INSTANCE);
-  }
-
-  static void appendTextInternal(String text) {
-    if (text == null) {
-      throw new IllegalArgumentException("text cannot be null");
-    }
-
-    __buffer.append(text);
-    ensureMaxBufferSize();
-    scheduleConsolePrint();
-  }
-
-  private static void ensureMaxBufferSize() {
-    if (__buffer.length() > __maxBufferSize) {
-      int requiredReplacedCharacters = __buffer.length() - __maxBufferSize;
-      __buffer.replace(0, requiredReplacedCharacters, "");
-    }
-  }
-
-  static void appendLine(String line) {
-    appendTextInternal(line);
-    appendTextInternal(END_LINE);
   }
 
   /**
