@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -24,17 +23,14 @@ import java.util.List;
  * from anywhere of application.
  * If you want to see the output, you should use console in any of your layouts,
  * all calls to console static write methods will affect all instantiated consoles.
- * You can also call writes directly to console view.
  */
-public class Console extends FrameLayout {
+public class Console extends ConsoleAncestorLayout {
   //region Constants
 
   // TODO: 16/02/16 Make this configurable - probably something like Console.Settings
   static final int MAX_BUFFER_SIZE = 16_000;
 
   static final String END_LINE = "\n";
-  static final String REMOVING_UNSUPPORTED_MESSAGE
-      = "Removing of Views is unsupported in " + Console.class;
 
   //endregion
 
@@ -107,7 +103,7 @@ public class Console extends FrameLayout {
   // of Console to be suppressed from outside
   private boolean _privateLayoutInflated;
 
-  // Fields is used to not schedule more than one runnable for scroll down
+  // Fields are used to not schedule more than one runnable for scroll down
   private boolean _fullScrollScheduled;
   private Runnable _scrollDownRunnable;
 
@@ -155,7 +151,7 @@ public class Console extends FrameLayout {
     _scrollView.setOnTouchListener(_userTouchingListener);
 
     printBuffer();
-    // need to have extra post here, because scroll view is fully initialized after another post
+    // need to have extra post here, because scroll view is fully initialized after another frame
     post(new Runnable() {
       @Override public void run() {
         scrollDown();
@@ -218,41 +214,6 @@ public class Console extends FrameLayout {
     } else {
       throw new UnsupportedOperationException("You cannot add views to " + Console.class);
     }
-  }
-
-  @Override
-  public void removeView(View view) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeViewInLayout(View view) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeViewsInLayout(int start, int count) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeViewAt(int index) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeViews(int start, int count) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeAllViews() {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public void removeAllViewsInLayout() {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
   }
 
   //endregion
