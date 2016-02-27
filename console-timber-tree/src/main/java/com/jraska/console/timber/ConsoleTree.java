@@ -1,5 +1,8 @@
 package com.jraska.console.timber;
 
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import com.jraska.console.Console;
 import timber.log.Timber;
@@ -19,6 +22,11 @@ public final class ConsoleTree extends Timber.Tree {
   //region Fields
 
   private final int _minPriority;
+
+  // TODO: 27/02/16 Make this configurable
+  private final int[] _priorityColorMapping = {0, 0, Color.parseColor("#909090"),
+      Color.parseColor("#c88b48"), Color.parseColor("#c9c9c9"), Color.parseColor("#a97db6"),
+      Color.parseColor("#ff534e"), Color.parseColor("#ff5540")};
 
   //endregion
 
@@ -54,15 +62,21 @@ public final class ConsoleTree extends Timber.Tree {
       consoleMessage = String.format("%s/%s: %s", toPriorityString(priority), tag, message);
     }
 
-    writeToConsole(consoleMessage);
+    writeToConsole(priority, consoleMessage);
   }
 
   //endregion
 
   //region Methods
 
-  protected void writeToConsole(String consoleMessage) {
-    Console.writeLine(consoleMessage);
+  protected void writeToConsole(int priority, String consoleMessage) {
+    Console.writeLine(createSpannable(priority, consoleMessage));
+  }
+
+  SpannableString createSpannable(int priority, String consoleMessage) {
+    SpannableString spannableString = new SpannableString(consoleMessage);
+    spannableString.setSpan(new ForegroundColorSpan(_priorityColorMapping[priority]), 0, consoleMessage.length(), 0);
+    return spannableString;
   }
 
   String createStackElementTag(StackTraceElement element) {
