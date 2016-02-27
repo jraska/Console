@@ -1,6 +1,9 @@
 package com.jraska.console;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import org.junit.After;
 import org.junit.Before;
@@ -61,11 +64,33 @@ public class ConsoleTest {
     Console.writeLine(testText);
 
     assertThat(_console.getConsoleText()).contains(testText);
-    assertThat(_console.getConsoleText()).contains(Console.END_LINE);
+    assertThat(_console.getConsoleText()).endsWith(Console.END_LINE);
+  }
+
+  @Test
+  public void testWriteSpannable() throws Exception {
+    SpannableString spannableString = new SpannableString("123456789");
+    spannableString.setSpan(new ForegroundColorSpan(Color.RED), 5, 8, 0);
+
+    Console.write(spannableString);
+
+    assertThat(_console.getConsoleText()).isEqualTo(spannableString.toString());
+  }
+
+  @Test
+  public void testWriteLineSpannable() throws Exception {
+    SpannableString spannableString = new SpannableString("123456789");
+    spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), 0, 4, 0);
+
+    Console.writeLine(spannableString);
+
+    assertThat(_console.getConsoleText()).contains(spannableString);
+    assertThat(_console.getConsoleText()).endsWith(Console.END_LINE);
   }
 
   @Test
   public void testClear() throws Exception {
+    Console.write(new SpannableString("123456789"));
     Console.writeLine("as6ad77asd8");
 
     Console.clear();
@@ -89,7 +114,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testWhenBufferSizeChanges_textIsShortened() throws Exception {
+  public void whenBufferSizeChanges_textIsShortened() throws Exception {
     Console.write("123456789");
 
     Console.__buffer.setSize(6);
@@ -99,7 +124,20 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testScrollDownScheduledOnlyOnceOnMultiWrite() throws Exception {
+  public void whenBufferSizeChanges_thenSpannableShortened() throws Exception {
+    SpannableString spannableString = new SpannableString("123456789");
+    spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), 3, 6, 0);
+
+    Console.write(spannableString);
+
+    Console.__buffer.setSize(5);
+    Console.scheduleBufferPrint();
+
+    assertThat(_console.getConsoleText()).isEqualTo("56789");
+  }
+
+  @Test
+  public void whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce() throws Exception {
     Console consoleSpy = Mockito.spy(_console);
     Console._consoles.set(0, new WeakReference<>(consoleSpy));
     consoleSpy.measure(0, 0); // simulate next frame

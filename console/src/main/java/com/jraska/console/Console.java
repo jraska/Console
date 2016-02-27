@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableString;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,28 @@ public class Console extends ConsoleAncestorLayout {
   }
 
   /**
+   * Write SpannableString to the console
+   * "null" is written if the object is null
+   *
+   * @param spannableString SpannableString to write
+   */
+  public static void write(SpannableString spannableString) {
+    __buffer.append(spannableString);
+    scheduleBufferPrint();
+  }
+
+  /**
+   * Write Spannable to console and starts new line
+   * "null" is written if the object is null
+   *
+   * @param spannableString SpannableString to write
+   */
+  public static void writeLine(SpannableString spannableString) {
+    __buffer.append(spannableString).append(END_LINE);
+    scheduleBufferPrint();
+  }
+
+  /**
    * Write provided object String representation to console
    * "null" is written if the object is null
    *
@@ -75,7 +98,7 @@ public class Console extends ConsoleAncestorLayout {
   //region Fields
 
   static List<WeakReference<Console>> _consoles = new ArrayList<>();
-  static ConsoleBuffer __buffer = new ConsoleBuffer(500);
+  static ConsoleBuffer __buffer = new ConsoleBuffer();
 
   // Handler for case writing is called from wrong thread
   private static volatile Handler __uiThreadHandler;
@@ -151,7 +174,7 @@ public class Console extends ConsoleAncestorLayout {
 
   //region Properties
 
-  String getConsoleText() {
+  CharSequence getConsoleText() {
     return _text.getText().toString();
   }
 
@@ -204,7 +227,7 @@ public class Console extends ConsoleAncestorLayout {
   }
 
   private void printBuffer() {
-    _text.setText(__buffer.getText());
+    __buffer.printTo(_text);
   }
 
   private void scrollDown() {
