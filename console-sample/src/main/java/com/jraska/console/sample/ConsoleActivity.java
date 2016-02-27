@@ -52,7 +52,7 @@ public class ConsoleActivity extends AppCompatActivity {
   protected void onStart() {
     super.onStart();
 
-    Timber.i("Client spent 1000$");
+    Timber.i("Important information");
   }
 
   @Override protected void onResume() {

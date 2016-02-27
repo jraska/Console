@@ -1,18 +1,32 @@
 package com.jraska.console.timber;
 
-import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import com.jraska.console.Console;
 import timber.log.Timber;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.util.Log.*;
+import static java.util.Locale.US;
 
 public final class ConsoleTree extends Timber.Tree {
 
   //region Constants
+
+  private static final int PLACEHOLDER = 0;
+  private static final int COLOR_VERBOSE = 0xff909090;
+  private static final int COLOR_DEBUG = 0xffc88b48;
+  private static final int COLOR_INFO = 0xffc9c9c9;
+  private static final int COLOR_WARN = 0xffa97db6;
+  private static final int COLOR_ERROR = 0xffff534e;
+  private static final int COLOR_WTF = 0xffff5540;
+
+  private static final int[] DEFAULT_COLORS = {PLACEHOLDER, PLACEHOLDER, COLOR_VERBOSE, COLOR_DEBUG,
+      COLOR_INFO, COLOR_WARN, COLOR_ERROR, COLOR_WTF};
+  private static final int REQUIRED_COLORS_LENGTH = DEFAULT_COLORS.length;
 
   private static final int CALL_STACK_INDEX = 6;
   private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
@@ -23,21 +37,27 @@ public final class ConsoleTree extends Timber.Tree {
 
   private final int _minPriority;
 
-  // TODO: 27/02/16 Make this configurable
-  private final int[] _priorityColorMapping = {0, 0, Color.parseColor("#909090"),
-      Color.parseColor("#c88b48"), Color.parseColor("#c9c9c9"), Color.parseColor("#a97db6"),
-      Color.parseColor("#ff534e"), Color.parseColor("#ff5540")};
+  private final int[] _priorityColorMapping;
 
   //endregion
 
   //region Constructors
 
   public ConsoleTree() {
-    this(Log.VERBOSE);
+    this(VERBOSE);
   }
 
   public ConsoleTree(int minPriority) {
+    this(minPriority, DEFAULT_COLORS);
+  }
+
+  private ConsoleTree(int minPriority, int[] colors) {
+    if (colors.length != REQUIRED_COLORS_LENGTH) {
+      throw new IllegalArgumentException("Colors array must have length=" + REQUIRED_COLORS_LENGTH);
+    }
+
     _minPriority = minPriority;
+    _priorityColorMapping = colors;
   }
 
   //endregion
@@ -99,17 +119,17 @@ public final class ConsoleTree extends Timber.Tree {
 
   protected String toPriorityString(int priority) {
     switch (priority) {
-      case Log.ASSERT:
+      case ASSERT:
         return "WTF";
-      case Log.ERROR:
+      case ERROR:
         return "E";
-      case Log.WARN:
+      case WARN:
         return "W";
-      case Log.INFO:
+      case INFO:
         return "I";
-      case Log.DEBUG:
+      case DEBUG:
         return "D";
-      case Log.VERBOSE:
+      case VERBOSE:
         return "V";
 
       default:
@@ -119,4 +139,57 @@ public final class ConsoleTree extends Timber.Tree {
 
   //endregion
 
+  //region Nested classes
+
+  public static class Builder {
+    private int _minPriority = VERBOSE;
+    private final int[] _colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
+
+    public Builder minPriority(int priority) {
+      if (priority < VERBOSE || priority > ASSERT) {
+        String message = String.format(US, "Priority %d is not in range <VERBOSE, ASSERT>(<%d,%d>)",
+            priority, VERBOSE, ASSERT);
+        throw new IllegalArgumentException(message);
+      }
+
+      _minPriority = priority;
+      return this;
+    }
+
+    public Builder verboseColor(int color) {
+      _colors[VERBOSE] = color;
+      return this;
+    }
+
+    public Builder debugColor(int color) {
+      _colors[DEBUG] = color;
+      return this;
+    }
+
+    public Builder infoColor(int color) {
+      _colors[INFO] = color;
+      return this;
+    }
+
+    public Builder warnColor(int color) {
+      _colors[WARN] = color;
+      return this;
+    }
+
+    public Builder errorColor(int color) {
+      _colors[ERROR] = color;
+      return this;
+    }
+
+    public Builder assertColor(int color) {
+      _colors[ASSERT] = color;
+      return this;
+    }
+
+    public ConsoleTree build() {
+      return new ConsoleTree(_minPriority, Arrays.copyOf(_colors, REQUIRED_COLORS_LENGTH));
+    }
+  }
+
+  //endregion
 }
