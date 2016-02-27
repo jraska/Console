@@ -32,7 +32,7 @@ Console.clear();
 
 Grab via Gradle: 
 ```groovy
-compile 'com.jraska:console:0.3.1'
+compile 'com.jraska:console:0.4.0'
 ```
 
 ## Timber Tree
@@ -41,15 +41,22 @@ To allow easy integration with [Timber]
 ### Usage
 ```java
 // In your Application or wherever you register your trees
-Timber.plant(new ConsoleTree());
+Timber.plant(new Console());
 
 // This will be written to your in-app console view
 Timber.d("Hello Console")
+
+// In case you want ot customize
+ConsoleTree consoleTree = new ConsoleTree.Builder()
+        .debugColor(Color.GRAY)
+        // ...
+        .build();
+Timber.plant(consoleTree);
 ```
 
 ### Gradle: 
 ```groovy
-compile 'com.jraska:console-timber-tree:0.3.1'
+compile 'com.jraska:console-timber-tree:0.4.0'
 ```
 
 ## License
