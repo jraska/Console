@@ -1,6 +1,5 @@
 package com.jraska.console.sample;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,32 +34,32 @@ public class ConsoleActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
 
     setSupportActionBar(_toolbar);
 
-    Console.write(currentTime() + " onCreate(");
-    Console.write(savedInstanceState);
-    Console.writeLine(")");
+    Console.writeLine("Hello Console!");
+    Console.writeLine();
 
-    Timber.i("Timber info");
+    Timber.d("Debugging: onCreate(%s)", savedInstanceState);
+    Timber.w("Warning makes me nervous...");
+    Timber.e("Some horrible ERROR!");
+    Timber.wtf("WTF*!?!");
   }
 
   @Override
   protected void onStart() {
     super.onStart();
 
-    Console.writeLine(currentTime() + " onStart()");
-    Timber.d("Timber debug");
+    Timber.i("Client spent 1000$");
   }
 
   @Override protected void onResume() {
     super.onResume();
 
-    Console.writeLine(currentTime() + " onResume()");
-    Timber.w("Timber warning");
+    Timber.v("I'm so talkative");
+    Timber.v("Blah blah blah...");
   }
 
   @Override
@@ -102,37 +101,13 @@ public class ConsoleActivity extends AppCompatActivity {
   }
 
   void onAsyncClicked() {
-    TestAsyncTask testAsyncTask = new TestAsyncTask();
-    testAsyncTask.execute(1000L);
+    ChattyAsync chattyAsync = new ChattyAsync();
+    chattyAsync.execute(1000L);
   }
 
   //endregion
 
   //region Nested classes
-
-  public static class TestAsyncTask extends AsyncTask<Long, Void, Void> {
-    @Override protected Void doInBackground(Long... params) {
-      long time = params[0];
-
-      sleep(time);
-      Console.writeLine("Message from async task after " + time + " ms");
-      sleep(time);
-      Console.write("Another Message from async tak new line in " + time + " ms");
-      sleep(time);
-      Console.writeLine();
-
-      return null;
-    }
-
-    private void sleep(long time) {
-      try {
-        Thread.sleep(time);
-      }
-      catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
 
   //endregion
 }
