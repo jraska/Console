@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-  compile 'com.jakewharton.timber:timber:4.1.0'
+  compile 'com.jakewharton.timber:timber:4.1.1'
 
   compile project(":console")
 }
