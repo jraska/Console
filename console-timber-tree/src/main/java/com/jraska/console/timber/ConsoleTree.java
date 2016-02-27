@@ -141,7 +141,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   //region Nested classes
 
-  public static class Builder {
+  public static final class Builder {
     private int _minPriority = VERBOSE;
     private final int[] _colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
 
