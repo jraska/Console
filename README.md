@@ -41,12 +41,12 @@ To allow easy integration with [Timber]
 ### Usage
 ```java
 // In your Application or wherever you register your trees
-Timber.plant(new Console());
+Timber.plant(new ConsoleTree());
 
 // This will be written to your in-app console view
 Timber.d("Hello Console")
 
-// In case you want ot customize
+// In case you want to customize
 ConsoleTree consoleTree = new ConsoleTree.Builder()
         .debugColor(Color.GRAY)
         // ...

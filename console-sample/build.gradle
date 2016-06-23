@@ -36,8 +36,8 @@ dependencies {
   compile project(':console')
   compile project(':console-timber-tree')
 
-  compile 'com.android.support:appcompat-v7:23.2.0'
-  compile 'com.android.support:design:23.2.0'
+  compile 'com.android.support:appcompat-v7:24.0.0'
+  compile 'com.android.support:design:24.0.0'
 
   compile 'com.jakewharton:butterknife:7.0.1'
 }
