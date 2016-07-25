@@ -43,7 +43,7 @@ public class ConsoleTest {
   public void tearDown() {
     Console.__buffer.setSize(ConsoleBuffer.MAX_BUFFER_SIZE);
     Console.clear();
-    Console._consoles.clear();
+    Console.__consoles.clear();
   }
 
   //endregion
@@ -139,7 +139,7 @@ public class ConsoleTest {
   @Test
   public void whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce() throws Exception {
     Console consoleSpy = Mockito.spy(_console);
-    Console._consoles.set(0, new WeakReference<>(consoleSpy));
+    Console.__consoles.set(0, new WeakReference<>(consoleSpy));
     consoleSpy.measure(0, 0); // simulate next frame
 
     Console.write("someText");

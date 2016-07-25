@@ -2,7 +2,6 @@ package com.jraska.console;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -18,16 +18,20 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jraska.console.ViewUtil.findViewByIdSafe;
+
 /**
  * Console like output view, which allows writing via static console methods
  * from anywhere of application.
  * If you want to see the output, you should use console in any of your layouts,
  * all calls to console static write methods will affect all instantiated consoles.
  */
-public class Console extends ConsoleAncestorLayout {
+public class Console extends FrameLayout {
   //region Constants
 
   static final String END_LINE = "\n";
+  static final String REMOVING_UNSUPPORTED_MESSAGE
+      = "Removing of Views is unsupported in " + Console.class;
 
   //endregion
 
@@ -90,14 +94,14 @@ public class Console extends ConsoleAncestorLayout {
   }
 
   public static int consoleViewsCount() {
-    return _consoles.size();
+    return __consoles.size();
   }
 
   //endregion
 
   //region Fields
 
-  static List<WeakReference<Console>> _consoles = new ArrayList<>();
+  static List<WeakReference<Console>> __consoles = new ArrayList<>();
   static ConsoleBuffer __buffer = new ConsoleBuffer();
 
   // Handler for case writing is called from wrong thread
@@ -149,14 +153,14 @@ public class Console extends ConsoleAncestorLayout {
 
   private void init(Context context) {
     // Store myself as weak reference for static method calls
-    _consoles.add(new WeakReference<>(this));
+    __consoles.add(new WeakReference<>(this));
 
     LayoutInflater.from(context).inflate(R.layout.console_content, this);
     _privateLayoutInflated = true;
 
-    _text = findViewByIdSafe(R.id.console_text);
+    _text = findViewByIdSafe(this, R.id.console_text);
 
-    _scrollView = findViewByIdSafe(R.id.console_scroll_view);
+    _scrollView = findViewByIdSafe(this, R.id.console_scroll_view);
     _flingProperty = FlingProperty.create(_scrollView);
     _userTouchingListener = new UserTouchingListener();
     _scrollView.setOnTouchListener(_userTouchingListener);
@@ -178,7 +182,7 @@ public class Console extends ConsoleAncestorLayout {
     return _text.getText().toString();
   }
 
-  boolean isUserInteracting() {
+  private boolean isUserInteracting() {
     return _userTouchingListener.isUserTouching() || _flingProperty.isFlinging();
   }
 
@@ -209,13 +213,52 @@ public class Console extends ConsoleAncestorLayout {
 
   @Override
   public void addView(View child, int index, ViewGroup.LayoutParams params) {
-    // its not possible to add views to Console, allow this only on initial layout creations
+    // It is not possible to add views to Console, allow this only on initial layout creations
     if (!_privateLayoutInflated) {
       super.addView(child, index, params);
     } else {
       throw new UnsupportedOperationException("You cannot add views to " + Console.class);
     }
   }
+
+  //region Suppress removing views
+
+  @Override
+  public final void removeView(View view) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeViewInLayout(View view) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeViewsInLayout(int start, int count) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeViewAt(int index) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeViews(int start, int count) {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeAllViews() {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  @Override
+  public final void removeAllViewsInLayout() {
+    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
+  }
+
+  //endregion
 
   //endregion
 
@@ -241,43 +284,6 @@ public class Console extends ConsoleAncestorLayout {
     _scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
-  /**
-   * Throws exception if the view is not found
-   *
-   * @return View for the id
-   */
-  @SuppressWarnings("unchecked") // Class cast is checked with exception catch
-  private <T extends View> T findViewByIdSafe(int resId) {
-    View view = findViewById(resId);
-
-    if (view != null) {
-      try {
-        return (T) view;
-      }
-      catch (ClassCastException ex) {
-        // Just transfer message for better debug information
-        String resName = getResourceName(resId);
-        String message = "View with id " + resName + " is of wrong type, see inner exception";
-        throw new IllegalStateException(message, ex);
-      }
-    }
-
-    String resName = getResourceName(resId);
-
-    String message = "There is no view with resource id" + resName + " in " + Console.class;
-    throw new IllegalArgumentException(message);
-  }
-
-  private String getResourceName(int resId) {
-    try {
-      return getResources().getResourceName(resId);
-    }
-    catch (Resources.NotFoundException ignored) {
-      // Just take hex representation of string
-      return Integer.toHexString(resId);
-    }
-  }
-
   static void scheduleBufferPrint() {
     runBufferPrint();
   }
@@ -289,11 +295,11 @@ public class Console extends ConsoleAncestorLayout {
     }
 
     // iteration from the end to allow in place removing
-    for (int consoleIndex = _consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
-      WeakReference<Console> consoleReference = _consoles.get(consoleIndex);
+    for (int consoleIndex = __consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
+      WeakReference<Console> consoleReference = __consoles.get(consoleIndex);
       Console console = consoleReference.get();
       if (console == null) {
-        _consoles.remove(consoleIndex);
+        __consoles.remove(consoleIndex);
       } else {
         console.printScroll();
       }
