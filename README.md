@@ -5,6 +5,7 @@ An Android console view, which allows you to log text using static calls, to eas
 [![Sample](https://img.shields.io/badge/Download-Sample-blue.svg)](https://drive.google.com/file/d/0B0T1YjC17C-rTDBWNDBaSWVhcjg/view?usp=sharing)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg) ](https://github.com/jraska/Console/blob/master/LICENSE)
 [![Download](https://api.bintray.com/packages/jraska/maven/com.jraska%3Aconsole/images/download.svg) ](https://bintray.com/jraska/maven/com.jraska%3Aconsole/_latestVersion)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Console-green.svg?style=true)](https://android-arsenal.com/details/1/3948)
 
 ![](images/sample_screen.png)
 
