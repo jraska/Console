@@ -66,7 +66,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   @Override
   protected boolean isLoggable(int priority) {
-    return priority >= _minPriority && Console.consoleViewsCount() >= 1;
+    return priority >= _minPriority;
   }
 
   @Override

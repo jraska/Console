@@ -2,6 +2,7 @@ package com.jraska.console.sample;
 
 import android.app.Application;
 import android.util.Log;
+import com.jraska.console.Console;
 import com.jraska.console.timber.ConsoleTree;
 import timber.log.Timber;
 
@@ -19,5 +20,7 @@ public class ConsoleApp extends Application {
         .assertColor(0xffff5540);
 
     Timber.plant(consoleBuilder.build());
+
+    Timber.i("Test message before attach of any view");
   }
 }
