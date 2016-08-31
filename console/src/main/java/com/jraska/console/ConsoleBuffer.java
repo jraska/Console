@@ -12,10 +12,10 @@ final class ConsoleBuffer {
 
   //region Fields
 
-  private final Object _lock = new Object();
+  private final Object lock = new Object();
 
-  private final SpannableStringBuilder _buffer = new SpannableStringBuilder();
-  private int _maxBufferSize = MAX_BUFFER_SIZE;
+  private final SpannableStringBuilder buffer = new SpannableStringBuilder();
+  private int maxBufferSize = MAX_BUFFER_SIZE;
 
   //endregion
 
@@ -25,9 +25,9 @@ final class ConsoleBuffer {
    * @return true if buffer content changed
    */
   boolean setSize(int maxBufferSize) {
-    synchronized (_lock) {
-      boolean bufferChange = maxBufferSize < _buffer.length();
-      _maxBufferSize = maxBufferSize;
+    synchronized (lock) {
+      boolean bufferChange = maxBufferSize < buffer.length();
+      this.maxBufferSize = maxBufferSize;
 
       ensureSize();
       return bufferChange;
@@ -43,27 +43,27 @@ final class ConsoleBuffer {
   }
 
   ConsoleBuffer append(CharSequence charSequence) {
-    synchronized (_lock) {
-      _buffer.append(charSequence);
+    synchronized (lock) {
+      buffer.append(charSequence);
       ensureSize();
     }
     return this;
   }
 
   ConsoleBuffer clear() {
-    _buffer.clear();
+    buffer.clear();
     return this;
   }
 
   ConsoleBuffer printTo(TextView textView) {
-    textView.setText(_buffer);
+    textView.setText(buffer);
     return this;
   }
 
   private void ensureSize() {
-    if (_buffer.length() > _maxBufferSize) {
-      int requiredReplacedCharacters = _buffer.length() - _maxBufferSize;
-      _buffer.replace(0, requiredReplacedCharacters, "");
+    if (buffer.length() > maxBufferSize) {
+      int requiredReplacedCharacters = buffer.length() - maxBufferSize;
+      buffer.replace(0, requiredReplacedCharacters, "");
     }
   }
 

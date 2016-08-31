@@ -9,14 +9,14 @@ import java.lang.reflect.Field;
  * Utility using reflection to pull up OverScroller and then use it as fling indicator.
  */
 final class FlingProperty {
-  private final OverScroller _overScroller;
+  private final OverScroller overScroller;
 
   private FlingProperty(OverScroller overScroller) {
-    _overScroller = overScroller;
+    this.overScroller = overScroller;
   }
 
   boolean isFlinging() {
-    return !_overScroller.isFinished();
+    return !overScroller.isFinished();
   }
 
   static FlingProperty create(ScrollView scrollView) {

@@ -35,9 +35,9 @@ public final class ConsoleTree extends Timber.Tree {
 
   //region Fields
 
-  private final int _minPriority;
+  private final int minPriority;
 
-  private final int[] _priorityColorMapping;
+  private final int[] priorityColorMapping;
 
   //endregion
 
@@ -56,8 +56,8 @@ public final class ConsoleTree extends Timber.Tree {
       throw new IllegalArgumentException("Colors array must have length=" + REQUIRED_COLORS_LENGTH);
     }
 
-    _minPriority = minPriority;
-    _priorityColorMapping = colors;
+    this.minPriority = minPriority;
+    priorityColorMapping = colors;
   }
 
   //endregion
@@ -66,7 +66,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   @Override
   protected boolean isLoggable(int priority) {
-    return priority >= _minPriority;
+    return priority >= minPriority;
   }
 
   @Override
@@ -95,7 +95,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   SpannableString createSpannable(int priority, String consoleMessage) {
     SpannableString spannableString = new SpannableString(consoleMessage);
-    spannableString.setSpan(new ForegroundColorSpan(_priorityColorMapping[priority]), 0, consoleMessage.length(), 0);
+    spannableString.setSpan(new ForegroundColorSpan(priorityColorMapping[priority]), 0, consoleMessage.length(), 0);
     return spannableString;
   }
 
@@ -142,8 +142,8 @@ public final class ConsoleTree extends Timber.Tree {
   //region Nested classes
 
   public static final class Builder {
-    private int _minPriority = VERBOSE;
-    private final int[] _colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
+    private int minPriority = VERBOSE;
+    private final int[] colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
 
     public Builder minPriority(int priority) {
       if (priority < VERBOSE || priority > ASSERT) {
@@ -152,42 +152,42 @@ public final class ConsoleTree extends Timber.Tree {
         throw new IllegalArgumentException(message);
       }
 
-      _minPriority = priority;
+      minPriority = priority;
       return this;
     }
 
     public Builder verboseColor(int color) {
-      _colors[VERBOSE] = color;
+      colors[VERBOSE] = color;
       return this;
     }
 
     public Builder debugColor(int color) {
-      _colors[DEBUG] = color;
+      colors[DEBUG] = color;
       return this;
     }
 
     public Builder infoColor(int color) {
-      _colors[INFO] = color;
+      colors[INFO] = color;
       return this;
     }
 
     public Builder warnColor(int color) {
-      _colors[WARN] = color;
+      colors[WARN] = color;
       return this;
     }
 
     public Builder errorColor(int color) {
-      _colors[ERROR] = color;
+      colors[ERROR] = color;
       return this;
     }
 
     public Builder assertColor(int color) {
-      _colors[ASSERT] = color;
+      colors[ASSERT] = color;
       return this;
     }
 
     public ConsoleTree build() {
-      return new ConsoleTree(_minPriority, Arrays.copyOf(_colors, REQUIRED_COLORS_LENGTH));
+      return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH));
     }
   }
 

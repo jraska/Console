@@ -20,15 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 
-/**
- * Test is moved here from console library module to enable Robolectric testing
- */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class ConsoleTest {
   //region Fields
 
-  private Console _console;
+  private Console console;
 
   //endregion
 
@@ -36,14 +33,14 @@ public class ConsoleTest {
 
   @Before
   public void setUp() {
-    _console = new Console(getAppContext());
+    console = new Console(getAppContext());
   }
 
   @After
   public void tearDown() {
-    Console.__buffer.setSize(ConsoleBuffer.MAX_BUFFER_SIZE);
+    Console.buffer.setSize(ConsoleBuffer.MAX_BUFFER_SIZE);
     Console.clear();
-    Console.__consoles.clear();
+    Console.consoles.clear();
   }
 
   //endregion
@@ -55,7 +52,7 @@ public class ConsoleTest {
     String testText = "asd5a6das7";
     Console.write(testText);
 
-    assertThat(_console.getConsoleText()).contains(testText);
+    assertThat(console.getConsoleText()).contains(testText);
   }
 
   @Test
@@ -63,8 +60,8 @@ public class ConsoleTest {
     String testText = "657ad52jh";
     Console.writeLine(testText);
 
-    assertThat(_console.getConsoleText()).contains(testText);
-    assertThat(_console.getConsoleText()).endsWith(Console.END_LINE);
+    assertThat(console.getConsoleText()).contains(testText);
+    assertThat(console.getConsoleText()).endsWith(Console.END_LINE);
   }
 
   @Test
@@ -74,7 +71,7 @@ public class ConsoleTest {
 
     Console.write(spannableString);
 
-    assertThat(_console.getConsoleText()).isEqualTo(spannableString.toString());
+    assertThat(console.getConsoleText()).isEqualTo(spannableString.toString());
   }
 
   @Test
@@ -84,8 +81,8 @@ public class ConsoleTest {
 
     Console.writeLine(spannableString);
 
-    assertThat(_console.getConsoleText()).contains(spannableString);
-    assertThat(_console.getConsoleText()).endsWith(Console.END_LINE);
+    assertThat(console.getConsoleText()).contains(spannableString);
+    assertThat(console.getConsoleText()).endsWith(Console.END_LINE);
   }
 
   @Test
@@ -95,32 +92,32 @@ public class ConsoleTest {
 
     Console.clear();
 
-    assertThat(_console.getConsoleText()).isEqualTo("");
+    assertThat(console.getConsoleText()).isEqualTo("");
   }
 
   @Test
   public void whenTextLongerThenBufferSize_printedTextIsShortened() throws Exception {
-    Console.__buffer.setSize(5);
+    Console.buffer.setSize(5);
 
     Console.write("123456789");
 
-    assertThat(_console.getConsoleText()).isEqualTo("56789");
+    assertThat(console.getConsoleText()).isEqualTo("56789");
 
     for (int i = 0; i < 5; i++) {
       Console.writeLine("");
     }
 
-    assertThat(_console.getConsoleText()).isEqualTo("\n\n\n\n\n");
+    assertThat(console.getConsoleText()).isEqualTo("\n\n\n\n\n");
   }
 
   @Test
   public void whenBufferSizeChanges_textIsShortened() throws Exception {
     Console.write("123456789");
 
-    Console.__buffer.setSize(6);
+    Console.buffer.setSize(6);
     Console.scheduleBufferPrint();
 
-    assertThat(_console.getConsoleText()).isEqualTo("456789");
+    assertThat(console.getConsoleText()).isEqualTo("456789");
   }
 
   @Test
@@ -130,16 +127,16 @@ public class ConsoleTest {
 
     Console.write(spannableString);
 
-    Console.__buffer.setSize(5);
+    Console.buffer.setSize(5);
     Console.scheduleBufferPrint();
 
-    assertThat(_console.getConsoleText()).isEqualTo("56789");
+    assertThat(console.getConsoleText()).isEqualTo("56789");
   }
 
   @Test
   public void whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce() throws Exception {
-    Console consoleSpy = Mockito.spy(_console);
-    Console.__consoles.set(0, new WeakReference<>(consoleSpy));
+    Console consoleSpy = Mockito.spy(console);
+    Console.consoles.set(0, new WeakReference<>(consoleSpy));
     consoleSpy.measure(0, 0); // simulate next frame
 
     Console.write("someText");
@@ -160,27 +157,27 @@ public class ConsoleTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFailsOn_addView() throws Exception {
-    _console.addView(new View(getAppContext()));
+    console.addView(new View(getAppContext()));
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFailsOn_removeViewAt() throws Exception {
-    _console.removeViewAt(0);
+    console.removeViewAt(0);
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFailsOn_removeView() throws Exception {
-    _console.removeView(_console.getChildAt(0));
+    console.removeView(console.getChildAt(0));
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFailsOn_removeAllViews() throws Exception {
-    _console.removeAllViews();
+    console.removeAllViews();
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFailsOn_removeAllViewsInLayout() throws Exception {
-    _console.removeAllViewsInLayout();
+    console.removeAllViewsInLayout();
   }
 
   //endregion

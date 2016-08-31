@@ -25,7 +25,7 @@ public class ConsoleActivity extends AppCompatActivity {
 
   //region Fields
 
-  @BindView(R.id.toolbar) Toolbar _toolbar;
+  @BindView(R.id.toolbar) Toolbar toolbar;
 
   //endregion
 
@@ -37,7 +37,7 @@ public class ConsoleActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
 
-    setSupportActionBar(_toolbar);
+    setSupportActionBar(toolbar);
 
     Console.writeLine("Hello Console!");
     Console.writeLine();

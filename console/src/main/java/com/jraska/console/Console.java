@@ -48,7 +48,7 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void writeLine(Object o) {
-    __buffer.append(o).append(END_LINE);
+    buffer.append(o).append(END_LINE);
     scheduleBufferPrint();
   }
 
@@ -59,7 +59,7 @@ public class Console extends FrameLayout {
    * @param spannableString SpannableString to write
    */
   public static void write(SpannableString spannableString) {
-    __buffer.append(spannableString);
+    buffer.append(spannableString);
     scheduleBufferPrint();
   }
 
@@ -70,7 +70,7 @@ public class Console extends FrameLayout {
    * @param spannableString SpannableString to write
    */
   public static void writeLine(SpannableString spannableString) {
-    __buffer.append(spannableString).append(END_LINE);
+    buffer.append(spannableString).append(END_LINE);
     scheduleBufferPrint();
   }
 
@@ -81,7 +81,7 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void write(Object o) {
-    __buffer.append(o);
+    buffer.append(o);
     scheduleBufferPrint();
   }
 
@@ -89,42 +89,42 @@ public class Console extends FrameLayout {
    * Clears the console text
    */
   public static void clear() {
-    __buffer.clear();
+    buffer.clear();
     scheduleBufferPrint();
   }
 
   public static int consoleViewsCount() {
-    return __consoles.size();
+    return consoles.size();
   }
 
   //endregion
 
   //region Fields
 
-  static List<WeakReference<Console>> __consoles = new ArrayList<>();
-  static ConsoleBuffer __buffer = new ConsoleBuffer();
+  static List<WeakReference<Console>> consoles = new ArrayList<>();
+  static ConsoleBuffer buffer = new ConsoleBuffer();
 
   // Handler for case writing is called from wrong thread
-  private static volatile Handler __uiThreadHandler;
-  private static final Object __lock = new Object();
+  private static volatile Handler uiThreadHandler;
+  private static final Object lock = new Object();
 
-  private TextView _text;
-  private ScrollView _scrollView;
+  private TextView text;
+  private ScrollView scrollView;
 
   // This will serve as flag for all view modifying methods
   // of Console to be suppressed from outside
-  private boolean _privateLayoutInflated;
+  private boolean privateLayoutInflated;
 
   // Fields are used to not schedule more than one runnable for scroll down
-  private boolean _fullScrollScheduled;
-  private final Runnable _scrollDownRunnable = new Runnable() {
+  private boolean fullScrollScheduled;
+  private final Runnable scrollDownRunnable = new Runnable() {
     @Override public void run() {
       scrollFullDown();
     }
   };
 
-  private UserTouchingListener _userTouchingListener;
-  private FlingProperty _flingProperty;
+  private UserTouchingListener userTouchingListener;
+  private FlingProperty flingProperty;
 
   //endregion
 
@@ -153,17 +153,17 @@ public class Console extends FrameLayout {
 
   private void init(Context context) {
     // Store myself as weak reference for static method calls
-    __consoles.add(new WeakReference<>(this));
+    consoles.add(new WeakReference<>(this));
 
     LayoutInflater.from(context).inflate(R.layout.console_content, this);
-    _privateLayoutInflated = true;
+    privateLayoutInflated = true;
 
-    _text = findViewByIdSafe(this, R.id.console_text);
+    text = findViewByIdSafe(this, R.id.console_text);
 
-    _scrollView = findViewByIdSafe(this, R.id.console_scroll_view);
-    _flingProperty = FlingProperty.create(_scrollView);
-    _userTouchingListener = new UserTouchingListener();
-    _scrollView.setOnTouchListener(_userTouchingListener);
+    scrollView = findViewByIdSafe(this, R.id.console_scroll_view);
+    flingProperty = FlingProperty.create(scrollView);
+    userTouchingListener = new UserTouchingListener();
+    scrollView.setOnTouchListener(userTouchingListener);
 
     printBuffer();
     // need to have extra post here, because scroll view is fully initialized after another frame
@@ -179,20 +179,20 @@ public class Console extends FrameLayout {
   //region Properties
 
   CharSequence getConsoleText() {
-    return _text.getText().toString();
+    return text.getText().toString();
   }
 
   private boolean isUserInteracting() {
-    return _userTouchingListener.isUserTouching() || _flingProperty.isFlinging();
+    return userTouchingListener.isUserTouching() || flingProperty.isFlinging();
   }
 
   private static Handler getUIThreadHandler() {
-    synchronized (__lock) {
-      if (__uiThreadHandler == null) {
-        __uiThreadHandler = new Handler(Looper.getMainLooper());
+    synchronized (lock) {
+      if (uiThreadHandler == null) {
+        uiThreadHandler = new Handler(Looper.getMainLooper());
       }
 
-      return __uiThreadHandler;
+      return uiThreadHandler;
     }
   }
 
@@ -208,13 +208,13 @@ public class Console extends FrameLayout {
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-    _fullScrollScheduled = false;
+    fullScrollScheduled = false;
   }
 
   @Override
   public void addView(View child, int index, ViewGroup.LayoutParams params) {
     // It is not possible to add views to Console, allow this only on initial layout creations
-    if (!_privateLayoutInflated) {
+    if (!privateLayoutInflated) {
       super.addView(child, index, params);
     } else {
       throw new UnsupportedOperationException("You cannot add views to " + Console.class);
@@ -270,18 +270,18 @@ public class Console extends FrameLayout {
   }
 
   private void printBuffer() {
-    __buffer.printTo(_text);
+    buffer.printTo(text);
   }
 
   private void scrollDown() {
-    if (!isUserInteracting() && !_fullScrollScheduled) {
-      post(_scrollDownRunnable);
-      _fullScrollScheduled = true;
+    if (!isUserInteracting() && !fullScrollScheduled) {
+      post(scrollDownRunnable);
+      fullScrollScheduled = true;
     }
   }
 
   private void scrollFullDown() {
-    _scrollView.fullScroll(View.FOCUS_DOWN);
+    scrollView.fullScroll(View.FOCUS_DOWN);
   }
 
   static void scheduleBufferPrint() {
@@ -295,11 +295,11 @@ public class Console extends FrameLayout {
     }
 
     // iteration from the end to allow in place removing
-    for (int consoleIndex = __consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
-      WeakReference<Console> consoleReference = __consoles.get(consoleIndex);
+    for (int consoleIndex = consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
+      WeakReference<Console> consoleReference = consoles.get(consoleIndex);
       Console console = consoleReference.get();
       if (console == null) {
-        __consoles.remove(consoleIndex);
+        consoles.remove(consoleIndex);
       } else {
         console.printScroll();
       }
