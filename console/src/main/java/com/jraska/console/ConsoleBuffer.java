@@ -56,7 +56,10 @@ final class ConsoleBuffer {
   }
 
   ConsoleBuffer printTo(TextView textView) {
-    textView.setText(buffer);
+    synchronized (lock) {
+      textView.setText(buffer);
+    }
+
     return this;
   }
 
