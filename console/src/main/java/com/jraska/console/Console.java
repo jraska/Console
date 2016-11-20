@@ -41,6 +41,14 @@ public class Console extends FrameLayout {
     write(END_LINE);
   }
 
+  public static void shouldBufferLogs(boolean enabled) {
+    buffer.shouldBufferLogs(enabled);
+  }
+
+  public static void setBufferDuration(long bufferDuration) {
+    buffer.setBufferDuration(bufferDuration);
+  }
+
   /**
    * Write provided object String representation to console and starts new line
    * "null" is written if the object is null
@@ -108,7 +116,7 @@ public class Console extends FrameLayout {
   private static volatile Handler uiThreadHandler;
   private static final Object lock = new Object();
 
-  private TextView text;
+  TextView text;
   private ScrollView scrollView;
 
   // This will serve as flag for all view modifying methods
@@ -186,7 +194,7 @@ public class Console extends FrameLayout {
     return userTouchingListener.isUserTouching() || flingProperty.isFlinging();
   }
 
-  private static Handler getUIThreadHandler() {
+  protected static Handler getUIThreadHandler() {
     synchronized (lock) {
       if (uiThreadHandler == null) {
         uiThreadHandler = new Handler(Looper.getMainLooper());

@@ -5,14 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+
 import com.jraska.console.Console;
-import timber.log.Timber;
 
 import java.text.DateFormat;
 import java.util.Date;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import timber.log.Timber;
 
 public class ConsoleActivity extends AppCompatActivity {
 
@@ -84,6 +86,11 @@ public class ConsoleActivity extends AppCompatActivity {
       return true;
     }
 
+    if(id == R.id.action_console_mass_text) {
+      onMassTextClicked();
+      return true;
+    }
+
     return super.onOptionsItemSelected(item);
   }
 
@@ -103,6 +110,12 @@ public class ConsoleActivity extends AppCompatActivity {
   void onAsyncClicked() {
     ChattyAsync chattyAsync = new ChattyAsync();
     chattyAsync.execute(1000L);
+  }
+
+  void onMassTextClicked() {
+    Console.shouldBufferLogs(true);
+    MassTextAsync async = new MassTextAsync();
+    async.execute(100 * 1000L); // should take a while to print 100,000 lines.
   }
 
   //endregion

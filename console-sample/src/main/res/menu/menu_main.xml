@@ -7,6 +7,10 @@
         android:title="@string/action_console_async"
         app:showAsAction="always" />
     <item
+        android:id="@+id/action_console_mass_text"
+        android:title="@string/action_console_mass_text"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_console_clear"
         android:title="@string/action_console_clear"
         android:icon="@drawable/ic_clear_24dp"

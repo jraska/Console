@@ -2,4 +2,5 @@
     <string name="app_name">Console Sample</string>
     <string name="action_console_clear">Clear Console</string>
     <string name="action_console_async">Async</string>
+    <string name="action_console_mass_text">Mass Text</string>
 </resources>
