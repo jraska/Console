@@ -100,9 +100,10 @@ class ConsoleBuffer {
           @Override
           public void run() {
             synchronized(lock) {
-              if (weakTextview.get() != null) {
+              TextView currentTextview = weakTextview.get();
+              if (currentTextview != null) {
                 // Text view still exists.
-                weakTextview.get().setText(buffer);
+                currentTextview.setText(buffer);
                 runnable = null;
                 waiting = false;
               }
