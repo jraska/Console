@@ -5,7 +5,10 @@ import android.text.style.ForegroundColorSpan;
 import com.jraska.console.Console;
 import timber.log.Timber;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +42,8 @@ public final class ConsoleTree extends Timber.Tree {
 
   private final int[] priorityColorMapping;
 
+  private final String timeFormat;
+
   //endregion
 
   //region Constructors
@@ -48,16 +53,17 @@ public final class ConsoleTree extends Timber.Tree {
   }
 
   public ConsoleTree(int minPriority) {
-    this(minPriority, DEFAULT_COLORS);
+    this(minPriority, DEFAULT_COLORS, null);
   }
 
-  private ConsoleTree(int minPriority, int[] colors) {
+  private ConsoleTree(int minPriority, int[] colors, String timeFormat) {
     if (colors.length != REQUIRED_COLORS_LENGTH) {
       throw new IllegalArgumentException("Colors array must have length=" + REQUIRED_COLORS_LENGTH);
     }
 
     this.minPriority = minPriority;
     priorityColorMapping = colors;
+    this.timeFormat = timeFormat;
   }
 
   //endregion
@@ -114,6 +120,11 @@ public final class ConsoleTree extends Timber.Tree {
     if (stackTrace.length <= CALL_STACK_INDEX) {
       return null;
     }
+    if (timeFormat != null) {
+      final String timeFormatted = new SimpleDateFormat(timeFormat, Locale.getDefault()).format(new Date());
+      return String.format("%s: %s", timeFormatted, createStackElementTag(stackTrace[CALL_STACK_INDEX]));
+    }
+
     return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
   }
 
@@ -143,6 +154,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   public static final class Builder {
     private int minPriority = VERBOSE;
+    private String timeFormat = null;
     private final int[] colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
 
     public Builder minPriority(int priority) {
@@ -186,8 +198,13 @@ public final class ConsoleTree extends Timber.Tree {
       return this;
     }
 
+    public Builder timestamp(String timeFormat){
+      this.timeFormat = timeFormat;
+      return this;
+    }
+
     public ConsoleTree build() {
-      return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH));
+      return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH), timeFormat);
     }
   }
 
