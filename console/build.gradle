@@ -55,5 +55,5 @@ ext {
   allLicenses = ["Apache-2.0"]
 }
 
-apply from: rootDir.absolutePath + '/gradle/installv1.gradle'
-apply from: rootDir.absolutePath + '/gradle/bintrayv1.gradle'
+apply from: '../gradle/installv1.gradle'
+apply from: '../gradle/bintrayv1.gradle'
