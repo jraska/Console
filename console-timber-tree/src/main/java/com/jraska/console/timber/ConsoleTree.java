@@ -17,6 +17,7 @@ import static java.util.Locale.US;
 
 public final class ConsoleTree extends Timber.Tree {
 
+  public static final String DEFAULT_TIMESTAMP = "HH:mm:ss";
   //region Constants
 
   private static final int PLACEHOLDER = 0;
@@ -33,6 +34,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   private static final int CALL_STACK_INDEX = 6;
   private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
+
 
   //endregion
 
@@ -198,7 +200,12 @@ public final class ConsoleTree extends Timber.Tree {
       return this;
     }
 
-    public Builder timestamp(String timeFormat){
+    public Builder useTimestamp(){
+      this.timeFormat = DEFAULT_TIMESTAMP;
+      return this;
+    }
+
+    public Builder useTimestamp(String timeFormat){
       this.timeFormat = timeFormat;
       return this;
     }

@@ -17,7 +17,8 @@ public class ConsoleApp extends Application {
         .infoColor(0xffc9c9c9)
         .warnColor(0xffa97db6)
         .errorColor(0xffff534e)
-        .assertColor(0xffff5540);
+        .assertColor(0xffff5540)
+        .useTimestamp(ConsoleTree.DEFAULT_TIMESTAMP);
 
     Timber.plant(consoleBuilder.build());
 
