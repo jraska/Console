@@ -2,7 +2,7 @@ package com.jraska.console.sample;
 
 import android.app.Application;
 import android.util.Log;
-import com.jraska.console.Console;
+
 import com.jraska.console.timber.ConsoleTree;
 import timber.log.Timber;
 
@@ -18,7 +18,7 @@ public class ConsoleApp extends Application {
         .warnColor(0xffa97db6)
         .errorColor(0xffff534e)
         .assertColor(0xffff5540)
-        .useTimestamp(ConsoleTree.DEFAULT_TIMESTAMP);
+        .useTimestamp(ConsoleTree.DEFAULT_TIME_FORMAT);
 
     Timber.plant(consoleBuilder.build());
 
