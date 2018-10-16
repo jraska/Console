@@ -2,10 +2,16 @@ package com.jraska.console.timber;
 
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+
 import com.jraska.console.Console;
+
 import timber.log.Timber;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +20,7 @@ import static java.util.Locale.US;
 
 public final class ConsoleTree extends Timber.Tree {
 
+  public static final DateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss", Locale.US);
   //region Constants
 
   private static final int PLACEHOLDER = 0;
@@ -39,6 +46,8 @@ public final class ConsoleTree extends Timber.Tree {
 
   private final int[] priorityColorMapping;
 
+  private final DateFormat timeFormat;
+
   //endregion
 
   //region Constructors
@@ -48,16 +57,17 @@ public final class ConsoleTree extends Timber.Tree {
   }
 
   public ConsoleTree(int minPriority) {
-    this(minPriority, DEFAULT_COLORS);
+    this(minPriority, DEFAULT_COLORS, null);
   }
 
-  private ConsoleTree(int minPriority, int[] colors) {
+  private ConsoleTree(int minPriority, int[] colors, DateFormat timeFormat) {
     if (colors.length != REQUIRED_COLORS_LENGTH) {
       throw new IllegalArgumentException("Colors array must have length=" + REQUIRED_COLORS_LENGTH);
     }
 
     this.minPriority = minPriority;
     priorityColorMapping = colors;
+    this.timeFormat = timeFormat;
   }
 
   //endregion
@@ -75,14 +85,18 @@ public final class ConsoleTree extends Timber.Tree {
       tag = getTag();
     }
 
-    String consoleMessage;
-    if (tag == null) {
-      consoleMessage = String.format("%s: %s", toPriorityString(priority), message);
-    } else {
-      consoleMessage = String.format("%s/%s: %s", toPriorityString(priority), tag, message);
+    StringBuilder consoleMessage = new StringBuilder(toPriorityString(priority));
+    if (timeFormat != null) {
+      final String timeFormatted = timeFormat.format(new Date());
+      consoleMessage.append("/").append(timeFormatted);
+    }
+    if (tag != null) {
+      consoleMessage.append("/").append(tag);
     }
 
-    writeToConsole(priority, consoleMessage);
+    consoleMessage.append(": ").append(message);
+
+    writeToConsole(priority, consoleMessage.toString());
   }
 
   //endregion
@@ -143,6 +157,7 @@ public final class ConsoleTree extends Timber.Tree {
 
   public static final class Builder {
     private int minPriority = VERBOSE;
+    private DateFormat timeFormat = null;
     private final int[] colors = Arrays.copyOf(DEFAULT_COLORS, REQUIRED_COLORS_LENGTH);
 
     public Builder minPriority(int priority) {
@@ -186,8 +201,18 @@ public final class ConsoleTree extends Timber.Tree {
       return this;
     }
 
+    public Builder useTimestamp() {
+      this.timeFormat = DEFAULT_TIME_FORMAT;
+      return this;
+    }
+
+    public Builder useTimestamp(DateFormat timeFormat) {
+      this.timeFormat = timeFormat;
+      return this;
+    }
+
     public ConsoleTree build() {
-      return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH));
+      return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH), timeFormat);
     }
   }
 
