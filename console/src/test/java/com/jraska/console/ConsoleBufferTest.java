@@ -1,9 +1,10 @@
 package com.jraska.console;
 
 import android.widget.TextView;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -12,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 26)
 public class ConsoleBufferTest {
-  static final int ATTEMPTS_COUNT = 1000;
+  private static final int ATTEMPTS_COUNT = 1000;
 
   @Test
   public void failsOnWrongBufferConcurrency() throws Exception {

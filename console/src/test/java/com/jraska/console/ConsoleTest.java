@@ -5,12 +5,13 @@ import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -20,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 26)
 public class ConsoleTest {
   //region Fields
 
@@ -48,7 +49,7 @@ public class ConsoleTest {
   //region Test Methods
 
   @Test
-  public void testWrite() throws Exception {
+  public void testWrite()  {
     String testText = "asd5a6das7";
     Console.write(testText);
 
@@ -56,7 +57,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testWriteLine() throws Exception {
+  public void testWriteLine()  {
     String testText = "657ad52jh";
     Console.writeLine(testText);
 
@@ -65,7 +66,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testWriteSpannable() throws Exception {
+  public void testWriteSpannable()  {
     SpannableString spannableString = new SpannableString("123456789");
     spannableString.setSpan(new ForegroundColorSpan(Color.RED), 5, 8, 0);
 
@@ -75,7 +76,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testWriteLineSpannable() throws Exception {
+  public void testWriteLineSpannable()  {
     SpannableString spannableString = new SpannableString("123456789");
     spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), 0, 4, 0);
 
@@ -86,7 +87,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void testClear() throws Exception {
+  public void testClear()  {
     Console.write(new SpannableString("123456789"));
     Console.writeLine("as6ad77asd8");
 
@@ -96,7 +97,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void whenTextLongerThenBufferSize_printedTextIsShortened() throws Exception {
+  public void whenTextLongerThenBufferSize_printedTextIsShortened()  {
     Console.buffer.setSize(5);
 
     Console.write("123456789");
@@ -111,7 +112,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void whenBufferSizeChanges_textIsShortened() throws Exception {
+  public void whenBufferSizeChanges_textIsShortened()  {
     Console.write("123456789");
 
     Console.buffer.setSize(6);
@@ -121,7 +122,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void whenBufferSizeChanges_thenSpannableShortened() throws Exception {
+  public void whenBufferSizeChanges_thenSpannableShortened()  {
     SpannableString spannableString = new SpannableString("123456789");
     spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), 3, 6, 0);
 
@@ -134,7 +135,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce() throws Exception {
+  public void whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce()  {
     Console consoleSpy = Mockito.spy(console);
     Console.consoles.set(0, new WeakReference<>(consoleSpy));
     consoleSpy.measure(0, 0); // simulate next frame
@@ -146,7 +147,7 @@ public class ConsoleTest {
   }
 
   @Test
-  public void whenNewConsoleViewCreated_thenBufferIsPrinted() throws Exception {
+  public void whenNewConsoleViewCreated_thenBufferIsPrinted()  {
     Console.write("text");
 
     Console newConsole = new Console(getAppContext());
@@ -156,27 +157,27 @@ public class ConsoleTest {
   //region View methods failures tests
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testFailsOn_addView() throws Exception {
+  public void testFailsOn_addView()  {
     console.addView(new View(getAppContext()));
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testFailsOn_removeViewAt() throws Exception {
+  public void testFailsOn_removeViewAt()  {
     console.removeViewAt(0);
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testFailsOn_removeView() throws Exception {
+  public void testFailsOn_removeView()  {
     console.removeView(console.getChildAt(0));
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testFailsOn_removeAllViews() throws Exception {
+  public void testFailsOn_removeAllViews()  {
     console.removeAllViews();
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testFailsOn_removeAllViewsInLayout() throws Exception {
+  public void testFailsOn_removeAllViewsInLayout()  {
     console.removeAllViewsInLayout();
   }
 
@@ -186,7 +187,7 @@ public class ConsoleTest {
 
   //region Properties
 
-  public Context getAppContext() {
+  private Context getAppContext() {
     return RuntimeEnvironment.application;
   }
 
