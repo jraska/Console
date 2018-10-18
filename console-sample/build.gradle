@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -34,12 +33,12 @@ android {
 }
 
 dependencies {
-  compile project(':console')
-  compile project(':console-timber-tree')
+  implementation project(':console')
+  implementation project(':console-timber-tree')
 
-  compile 'com.android.support:appcompat-v7:24.1.1'
-  compile 'com.android.support:design:24.1.1'
+  implementation 'com.android.support:appcompat-v7:28.0.0'
+  implementation 'com.android.support:design:28.0.0'
 
-  compile 'com.jakewharton:butterknife:8.2.1'
-  apt 'com.jakewharton:butterknife-compiler:8.2.1'
+  implementation 'com.jakewharton:butterknife:8.8.1'
+  annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
