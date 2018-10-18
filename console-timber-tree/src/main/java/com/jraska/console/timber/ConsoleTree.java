@@ -5,23 +5,26 @@ import android.text.style.ForegroundColorSpan;
 
 import com.jraska.console.Console;
 
-import timber.log.Timber;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static android.util.Log.*;
+import timber.log.Timber;
+
+import static android.util.Log.ASSERT;
+import static android.util.Log.DEBUG;
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
+import static android.util.Log.VERBOSE;
+import static android.util.Log.WARN;
 import static java.util.Locale.US;
 
 public final class ConsoleTree extends Timber.Tree {
-
-  public static final DateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss", Locale.US);
-  //region Constants
 
   private static final int PLACEHOLDER = 0;
   private static final int COLOR_VERBOSE = 0xff909090;
@@ -32,25 +35,19 @@ public final class ConsoleTree extends Timber.Tree {
   private static final int COLOR_WTF = 0xffff5540;
 
   private static final int[] DEFAULT_COLORS = {PLACEHOLDER, PLACEHOLDER, COLOR_VERBOSE, COLOR_DEBUG,
-      COLOR_INFO, COLOR_WARN, COLOR_ERROR, COLOR_WTF};
+    COLOR_INFO, COLOR_WARN, COLOR_ERROR, COLOR_WTF};
   private static final int REQUIRED_COLORS_LENGTH = DEFAULT_COLORS.length;
 
   private static final int CALL_STACK_INDEX = 6;
   private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
 
-  //endregion
-
-  //region Fields
-
   private final int minPriority;
-
   private final int[] priorityColorMapping;
-
   private final DateFormat timeFormat;
 
-  //endregion
-
-  //region Constructors
+  public static ConsoleTree.Builder builder() {
+    return new ConsoleTree.Builder();
+  }
 
   public ConsoleTree() {
     this(VERBOSE);
@@ -70,17 +67,13 @@ public final class ConsoleTree extends Timber.Tree {
     this.timeFormat = timeFormat;
   }
 
-  //endregion
-
-  //region Tree impl
-
   @Override
-  protected boolean isLoggable(int priority) {
+  protected boolean isLoggable(@Nullable String tag, int priority) {
     return priority >= minPriority;
   }
 
   @Override
-  protected final void log(int priority, String tag, String message, Throwable t) {
+  protected final void log(int priority, String tag, @NotNull String message, Throwable t) {
     if (tag == null) {
       tag = getTag();
     }
@@ -99,21 +92,17 @@ public final class ConsoleTree extends Timber.Tree {
     writeToConsole(priority, consoleMessage.toString());
   }
 
-  //endregion
-
-  //region Methods
-
-  protected void writeToConsole(int priority, String consoleMessage) {
+  private void writeToConsole(int priority, String consoleMessage) {
     Console.writeLine(createSpannable(priority, consoleMessage));
   }
 
-  SpannableString createSpannable(int priority, String consoleMessage) {
+  private SpannableString createSpannable(int priority, String consoleMessage) {
     SpannableString spannableString = new SpannableString(consoleMessage);
     spannableString.setSpan(new ForegroundColorSpan(priorityColorMapping[priority]), 0, consoleMessage.length(), 0);
     return spannableString;
   }
 
-  String createStackElementTag(StackTraceElement element) {
+  private String createStackElementTag(StackTraceElement element) {
     String tag = element.getClassName();
     Matcher matcher = ANONYMOUS_CLASS.matcher(tag);
     if (matcher.find()) {
@@ -131,7 +120,7 @@ public final class ConsoleTree extends Timber.Tree {
     return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
   }
 
-  protected String toPriorityString(int priority) {
+  private String toPriorityString(int priority) {
     switch (priority) {
       case ASSERT:
         return "WTF";
@@ -151,10 +140,6 @@ public final class ConsoleTree extends Timber.Tree {
     }
   }
 
-  //endregion
-
-  //region Nested classes
-
   public static final class Builder {
     private int minPriority = VERBOSE;
     private DateFormat timeFormat = null;
@@ -163,7 +148,7 @@ public final class ConsoleTree extends Timber.Tree {
     public Builder minPriority(int priority) {
       if (priority < VERBOSE || priority > ASSERT) {
         String message = String.format(US, "Priority %d is not in range <VERBOSE, ASSERT>(<%d,%d>)",
-            priority, VERBOSE, ASSERT);
+          priority, VERBOSE, ASSERT);
         throw new IllegalArgumentException(message);
       }
 
@@ -201,12 +186,7 @@ public final class ConsoleTree extends Timber.Tree {
       return this;
     }
 
-    public Builder useTimestamp() {
-      this.timeFormat = DEFAULT_TIME_FORMAT;
-      return this;
-    }
-
-    public Builder useTimestamp(DateFormat timeFormat) {
+    public Builder timeFormat(DateFormat timeFormat) {
       this.timeFormat = timeFormat;
       return this;
     }
@@ -215,6 +195,4 @@ public final class ConsoleTree extends Timber.Tree {
       return new ConsoleTree(minPriority, Arrays.copyOf(colors, REQUIRED_COLORS_LENGTH), timeFormat);
     }
   }
-
-  //endregion
 }
