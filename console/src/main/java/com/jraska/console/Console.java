@@ -18,8 +18,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jraska.console.ViewUtil.findViewByIdSafe;
-
 /**
  * Console like output view, which allows writing via static console methods
  * from anywhere of application.
@@ -88,7 +86,7 @@ public class Console extends FrameLayout {
     scheduleBufferPrint();
   }
 
-  public static int consoleViewsCount() {
+  public static int consoleCount() {
     return consoles.size();
   }
 
@@ -104,14 +102,11 @@ public class Console extends FrameLayout {
   private TextView text;
   private ScrollView scrollView;
 
-  // This will serve as flag for all view modifying methods
-  // of Console to be suppressed from outside
-  private boolean privateLayoutInflated;
-
   // Fields are used to not schedule more than one runnable for scroll down
   private boolean fullScrollScheduled;
   private final Runnable scrollDownRunnable = new Runnable() {
-    @Override public void run() {
+    @Override
+    public void run() {
       scrollFullDown();
     }
   };
@@ -146,11 +141,10 @@ public class Console extends FrameLayout {
     consoles.add(new WeakReference<>(this));
 
     LayoutInflater.from(context).inflate(R.layout.console_content, this);
-    privateLayoutInflated = true;
 
-    text = findViewByIdSafe(this, R.id.console_text);
+    text = findViewById(R.id.console_text);
 
-    scrollView = findViewByIdSafe(this, R.id.console_scroll_view);
+    scrollView = findViewById(R.id.console_scroll_view);
     flingProperty = FlingProperty.create(scrollView);
     userTouchingListener = new UserTouchingListener();
     scrollView.setOnTouchListener(userTouchingListener);
