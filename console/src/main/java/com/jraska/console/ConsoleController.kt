@@ -85,5 +85,3 @@ internal class ConsoleController {
     val END_LINE = "\n"
   }
 }
-
-
