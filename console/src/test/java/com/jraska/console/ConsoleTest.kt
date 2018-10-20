@@ -138,5 +138,6 @@ class ConsoleTest {
 
     val newConsole = Console(application)
     assertThat(newConsole.consoleText).isEqualTo("text")
+    assertThat(Console.consoleCount()).isEqualTo(2)
   }
 }
