@@ -15,6 +15,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment.application
 import org.robolectric.annotation.Config
 import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, sdk = [26])
@@ -139,6 +141,28 @@ class ConsoleTest {
     val newConsole = Console(application)
     assertThat(newConsole.consoleText).isEqualTo("text")
     assertThat(Console.consoleCount()).isEqualTo(2)
+  }
+
+  @Test
+  fun survivesProperlyConcurrencyIssues() {
+    buffer().setSize(10)
+
+    val finishLatch = CountDownLatch(1)
+    val appendRunnable = Runnable {
+      for (i in 0..1000) {
+        Console.write("textToAppend")
+      }
+
+      finishLatch.countDown()
+    }
+    Thread(appendRunnable).start()
+
+    for (i in 0..1000) {
+      Console.writeLine("daa")
+    }
+
+    val await = finishLatch.await(1, TimeUnit.SECONDS)
+    assertThat(await).isTrue()
   }
 
   private fun buffer() = Console.controller.buffer
