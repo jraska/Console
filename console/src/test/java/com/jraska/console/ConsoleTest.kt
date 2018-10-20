@@ -29,9 +29,9 @@ class ConsoleTest {
 
   @After
   fun tearDown() {
-    Console.buffer.setSize(ConsoleBuffer.MAX_BUFFER_SIZE)
+    buffer().setSize(ConsoleBuffer.MAX_BUFFER_SIZE)
     Console.clear()
-    Console.consoles.clear()
+    Console.controller.consoles.clear()
   }
 
   @Test
@@ -48,7 +48,7 @@ class ConsoleTest {
     Console.writeLine(testText)
 
     assertThat(console.consoleText).contains(testText)
-    assertThat(console.consoleText).endsWith(Console.END_LINE)
+    assertThat(console.consoleText).endsWith(ConsoleController.END_LINE)
   }
 
   @Test
@@ -69,7 +69,7 @@ class ConsoleTest {
     Console.writeLine(spannableString)
 
     assertThat(console.consoleText).contains(spannableString)
-    assertThat(console.consoleText).endsWith(Console.END_LINE)
+    assertThat(console.consoleText).endsWith(ConsoleController.END_LINE)
   }
 
   @Test
@@ -84,7 +84,7 @@ class ConsoleTest {
 
   @Test
   fun whenTextLongerThenBufferSize_printedTextIsShortened() {
-    Console.buffer.setSize(5)
+    buffer().setSize(5)
 
     Console.write("123456789")
 
@@ -101,8 +101,8 @@ class ConsoleTest {
   fun whenBufferSizeChanges_textIsShortened() {
     Console.write("123456789")
 
-    Console.buffer.setSize(6)
-    Console.scheduleBufferPrint()
+    buffer().setSize(6)
+    Console.controller.scheduleBufferPrint()
 
     assertThat(console.consoleText).isEqualTo("456789")
   }
@@ -114,8 +114,8 @@ class ConsoleTest {
 
     Console.write(spannableString)
 
-    Console.buffer.setSize(5)
-    Console.scheduleBufferPrint()
+    buffer().setSize(5)
+    Console.controller.scheduleBufferPrint()
 
     assertThat(console.consoleText).isEqualTo("56789")
   }
@@ -123,7 +123,7 @@ class ConsoleTest {
   @Test
   fun whenWrittenMultipleTimes_thenScrollDownScheduledOnlyOnce() {
     val consoleSpy = Mockito.spy(console)
-    Console.consoles[0] = WeakReference(consoleSpy)
+    Console.controller.consoles[0] = WeakReference(consoleSpy)
     consoleSpy.measure(0, 0) // simulate next frame
 
     Console.write("someText")
@@ -140,4 +140,6 @@ class ConsoleTest {
     assertThat(newConsole.consoleText).isEqualTo("text")
     assertThat(Console.consoleCount()).isEqualTo(2)
   }
+
+  private fun buffer() = Console.controller.buffer
 }

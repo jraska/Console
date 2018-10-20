@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.SpannableString;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -13,10 +11,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Console like output view, which allows writing via static console methods
@@ -26,12 +20,10 @@ import java.util.List;
  */
 public class Console extends FrameLayout {
 
-  static final String END_LINE = "\n";
-
   //region Public Static API
 
   public static void writeLine() {
-    write(END_LINE);
+    controller.writeLine();
   }
 
   /**
@@ -41,8 +33,7 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void writeLine(Object o) {
-    buffer.append(o).append(END_LINE);
-    scheduleBufferPrint();
+    controller.writeLine(o);
   }
 
   /**
@@ -52,8 +43,7 @@ public class Console extends FrameLayout {
    * @param spannableString SpannableString to write
    */
   public static void write(SpannableString spannableString) {
-    buffer.append(spannableString);
-    scheduleBufferPrint();
+    controller.write(spannableString);
   }
 
   /**
@@ -63,8 +53,7 @@ public class Console extends FrameLayout {
    * @param spannableString SpannableString to write
    */
   public static void writeLine(SpannableString spannableString) {
-    buffer.append(spannableString).append(END_LINE);
-    scheduleBufferPrint();
+    controller.writeLine(spannableString);
   }
 
   /**
@@ -74,30 +63,23 @@ public class Console extends FrameLayout {
    * @param o Object to write
    */
   public static void write(Object o) {
-    buffer.append(o);
-    scheduleBufferPrint();
+    controller.write(o);
   }
 
   /**
    * Clears the console text
    */
   public static void clear() {
-    buffer.clear();
-    scheduleBufferPrint();
+    controller.clear();
   }
 
   public static int consoleCount() {
-    return consoles.size();
+    return controller.size();
   }
 
   //endregion
 
-  static List<WeakReference<Console>> consoles = new ArrayList<>();
-  static ConsoleBuffer buffer = new ConsoleBuffer();
-
-  // Handler for case writing is called from wrong thread
-  private static volatile Handler uiThreadHandler;
-  private static final Object lock = new Object();
+  static final ConsoleController controller = new ConsoleController();
 
   private TextView text;
   private ScrollView scrollView;
@@ -138,7 +120,7 @@ public class Console extends FrameLayout {
   @SuppressLint("ClickableViewAccessibility")
   private void init(Context context) {
     // Store myself as weak reference for static method calls
-    consoles.add(new WeakReference<>(this));
+    controller.add(this);
 
     LayoutInflater.from(context).inflate(R.layout.console_content, this);
 
@@ -152,7 +134,8 @@ public class Console extends FrameLayout {
     printBuffer();
     // need to have extra post here, because scroll view is fully initialized after another frame
     post(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         scrollDown();
       }
     });
@@ -166,20 +149,6 @@ public class Console extends FrameLayout {
     return userTouchingListener.isUserTouching() || flingProperty.isFlinging();
   }
 
-  private static Handler getUIThreadHandler() {
-    synchronized (lock) {
-      if (uiThreadHandler == null) {
-        uiThreadHandler = new Handler(Looper.getMainLooper());
-      }
-
-      return uiThreadHandler;
-    }
-  }
-
-  private static boolean isUIThread() {
-    return Looper.myLooper() == Looper.getMainLooper();
-  }
-
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -187,13 +156,13 @@ public class Console extends FrameLayout {
     fullScrollScheduled = false;
   }
 
-  private void printScroll() {
+  void printScroll() {
     printBuffer();
     scrollDown();
   }
 
   private void printBuffer() {
-    buffer.printTo(text);
+    controller.printTo(text);
   }
 
   private void scrollDown() {
@@ -205,36 +174,5 @@ public class Console extends FrameLayout {
 
   private void scrollFullDown() {
     scrollView.fullScroll(View.FOCUS_DOWN);
-  }
-
-  static void scheduleBufferPrint() {
-    runBufferPrint();
-  }
-
-  private static void runBufferPrint() {
-    if (!isUIThread()) {
-      getUIThreadHandler().post(BufferPrintRunnable.INSTANCE);
-      return;
-    }
-
-    // iteration from the end to allow in place removing
-    for (int consoleIndex = consoles.size() - 1; consoleIndex >= 0; consoleIndex--) {
-      WeakReference<Console> consoleReference = consoles.get(consoleIndex);
-      Console console = consoleReference.get();
-      if (console == null) {
-        consoles.remove(consoleIndex);
-      } else {
-        console.printScroll();
-      }
-    }
-  }
-
-  static class BufferPrintRunnable implements Runnable {
-    private static final BufferPrintRunnable INSTANCE = new BufferPrintRunnable();
-
-    @Override
-    public void run() {
-      runBufferPrint();
-    }
   }
 }
