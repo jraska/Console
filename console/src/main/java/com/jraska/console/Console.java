@@ -1,5 +1,6 @@
 package com.jraska.console;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -9,7 +10,6 @@ import android.text.SpannableString;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -27,13 +27,8 @@ import static com.jraska.console.ViewUtil.findViewByIdSafe;
  * all calls to console static write methods will affect all instantiated consoles.
  */
 public class Console extends FrameLayout {
-  //region Constants
 
   static final String END_LINE = "\n";
-  static final String REMOVING_UNSUPPORTED_MESSAGE
-      = "Removing of Views is unsupported in " + Console.class;
-
-  //endregion
 
   //region Public Static API
 
@@ -99,8 +94,6 @@ public class Console extends FrameLayout {
 
   //endregion
 
-  //region Fields
-
   static List<WeakReference<Console>> consoles = new ArrayList<>();
   static ConsoleBuffer buffer = new ConsoleBuffer();
 
@@ -126,10 +119,6 @@ public class Console extends FrameLayout {
   private UserTouchingListener userTouchingListener;
   private FlingProperty flingProperty;
 
-  //endregion
-
-  //region Constructors
-
   public Console(Context context) {
     super(context);
     init(context);
@@ -151,6 +140,7 @@ public class Console extends FrameLayout {
     init(context);
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   private void init(Context context) {
     // Store myself as weak reference for static method calls
     consoles.add(new WeakReference<>(this));
@@ -174,10 +164,6 @@ public class Console extends FrameLayout {
     });
   }
 
-  //endregion
-
-  //region Properties
-
   CharSequence getConsoleText() {
     return text.getText().toString();
   }
@@ -200,69 +186,12 @@ public class Console extends FrameLayout {
     return Looper.myLooper() == Looper.getMainLooper();
   }
 
-  //endregion
-
-  //region FrameLayout overrides
-
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     fullScrollScheduled = false;
   }
-
-  @Override
-  public void addView(View child, int index, ViewGroup.LayoutParams params) {
-    // It is not possible to add views to Console, allow this only on initial layout creations
-    if (!privateLayoutInflated) {
-      super.addView(child, index, params);
-    } else {
-      throw new UnsupportedOperationException("You cannot add views to " + Console.class);
-    }
-  }
-
-  //region Suppress removing views
-
-  @Override
-  public final void removeView(View view) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeViewInLayout(View view) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeViewsInLayout(int start, int count) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeViewAt(int index) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeViews(int start, int count) {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeAllViews() {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  @Override
-  public final void removeAllViewsInLayout() {
-    throw new UnsupportedOperationException(REMOVING_UNSUPPORTED_MESSAGE);
-  }
-
-  //endregion
-
-  //endregion
-
-  //region Methods
 
   private void printScroll() {
     printBuffer();
@@ -306,10 +235,6 @@ public class Console extends FrameLayout {
     }
   }
 
-  //endregion
-
-  //region Nested classes
-
   static class BufferPrintRunnable implements Runnable {
     private static final BufferPrintRunnable INSTANCE = new BufferPrintRunnable();
 
@@ -318,6 +243,4 @@ public class Console extends FrameLayout {
       runBufferPrint();
     }
   }
-
-  //endregion
 }
