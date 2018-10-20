@@ -71,12 +71,12 @@ class ConsoleActivity : AppCompatActivity() {
     return DATE_FORMAT.format(Date())
   }
 
-  internal fun onAsyncClicked() {
-    val chattyAsync = ChattyAsync()
-    chattyAsync.execute(1000L)
+  private fun onAsyncClicked() {
+    val chattyAsync = ChattyAsync(1000L)
+    chattyAsync.execute()
   }
 
   companion object {
-    val DATE_FORMAT = DateFormat.getTimeInstance(DateFormat.MEDIUM)
+    val DATE_FORMAT: DateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM)
   }
 }
