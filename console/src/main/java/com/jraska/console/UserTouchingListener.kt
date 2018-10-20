@@ -1,27 +1,18 @@
-package com.jraska.console;
+package com.jraska.console
 
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.MotionEvent
+import android.view.View
 
-final class UserTouchingListener implements View.OnTouchListener {
-  private boolean userHolds;
+internal class UserTouchingListener : View.OnTouchListener {
+  var isUserTouching: Boolean = false
+    private set
 
-  boolean isUserTouching() {
-    return userHolds;
-  }
-
-  @Override
-  public boolean onTouch(View v, MotionEvent event) {
-    switch (event.getActionMasked()) {
-      case MotionEvent.ACTION_MOVE:
-        userHolds = true;
-        break;
-
-      case MotionEvent.ACTION_UP:
-      case MotionEvent.ACTION_CANCEL:
-        userHolds = false;
+  override fun onTouch(v: View, event: MotionEvent): Boolean {
+    when (event.actionMasked) {
+      MotionEvent.ACTION_MOVE -> isUserTouching = true
+      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> isUserTouching = false
     }
 
-    return false;
+    return false
   }
 }

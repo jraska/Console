@@ -1,74 +1,60 @@
-package com.jraska.console;
+package com.jraska.console
 
-import android.text.SpannableStringBuilder;
-import android.widget.TextView;
+import android.text.SpannableStringBuilder
+import android.widget.TextView
 
-final class ConsoleBuffer {
-  //region Constants
+internal class ConsoleBuffer {
+  private val lock = Any()
 
-  static int MAX_BUFFER_SIZE = 16_000;
-
-  //endregion
-
-  //region Fields
-
-  private final Object lock = new Object();
-
-  private final SpannableStringBuilder buffer = new SpannableStringBuilder();
-  private int maxBufferSize = MAX_BUFFER_SIZE;
-
-  //endregion
-
-  //region Properties
+  private val buffer = SpannableStringBuilder()
+  private var maxBufferSize = MAX_BUFFER_SIZE
 
   /**
    * @return true if buffer content changed
    */
-  boolean setSize(int maxBufferSize) {
-    synchronized (lock) {
-      boolean bufferChange = maxBufferSize < buffer.length();
-      this.maxBufferSize = maxBufferSize;
+  fun setSize(maxBufferSize: Int): Boolean {
+    synchronized(lock) {
+      val bufferChange = maxBufferSize < buffer.length
+      this.maxBufferSize = maxBufferSize
 
-      ensureSize();
-      return bufferChange;
+      ensureSize()
+      return bufferChange
     }
   }
 
-  //endregion
-
-  //region Methods
-
-  ConsoleBuffer append(Object o) {
-    return append(o == null ? "null" : o.toString());
+  fun append(o: Any?): ConsoleBuffer {
+    return append(o?.toString() ?: "null")
   }
 
-  ConsoleBuffer append(CharSequence charSequence) {
-    synchronized (lock) {
-      buffer.append(charSequence);
-      ensureSize();
+  fun append(charSequence: CharSequence): ConsoleBuffer {
+    synchronized(lock) {
+      buffer.append(charSequence)
+      ensureSize()
     }
-    return this;
+    return this
   }
 
-  ConsoleBuffer clear() {
-    buffer.clear();
-    return this;
+  fun clear(): ConsoleBuffer {
+    buffer.clear()
+    return this
   }
 
-  ConsoleBuffer printTo(TextView textView) {
-    synchronized (lock) {
-      textView.setText(buffer);
+  fun printTo(textView: TextView): ConsoleBuffer {
+    synchronized(lock) {
+      textView.text = buffer
     }
 
-    return this;
+    return this
   }
 
-  private void ensureSize() {
-    if (buffer.length() > maxBufferSize) {
-      int requiredReplacedCharacters = buffer.length() - maxBufferSize;
-      buffer.replace(0, requiredReplacedCharacters, "");
+  private fun ensureSize() {
+    if (buffer.length > maxBufferSize) {
+      val requiredReplacedCharacters = buffer.length - maxBufferSize
+      buffer.replace(0, requiredReplacedCharacters, "")
     }
   }
 
-  //endregion
+  companion object {
+    const val MAX_BUFFER_SIZE = 16000
+  }
 }

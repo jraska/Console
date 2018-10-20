@@ -1,40 +1,23 @@
-package com.jraska.console;
+package com.jraska.console
 
-import android.widget.OverScroller;
-import android.widget.ScrollView;
-
-import java.lang.reflect.Field;
+import android.widget.OverScroller
+import android.widget.ScrollView
 
 /**
  * Utility using reflection to pull up OverScroller and then use it as fling indicator.
  */
-final class FlingProperty {
-  private final OverScroller overScroller;
+internal class FlingProperty private constructor(private val overScroller: OverScroller) {
 
-  private FlingProperty(OverScroller overScroller) {
-    this.overScroller = overScroller;
-  }
+  val isFlinging: Boolean
+    get() = !overScroller.isFinished
 
-  boolean isFlinging() {
-    return !overScroller.isFinished();
-  }
+  companion object {
+    fun create(scrollView: ScrollView): FlingProperty {
+      val scrollerField = ScrollView::class.java.getDeclaredField("mScroller")
+      scrollerField.isAccessible = true
 
-  static FlingProperty create(ScrollView scrollView) {
-    try {
-      return createUnchecked(scrollView);
+      val scroller = scrollerField.get(scrollView) as OverScroller
+      return FlingProperty(scroller)
     }
-    // catching generic exception as workaround to reflective exception changes on API changes
-    catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static FlingProperty createUnchecked(ScrollView forScrollView)
-      throws NoSuchFieldException, IllegalAccessException {
-    Field scrollerField = ScrollView.class.getDeclaredField("mScroller");
-    scrollerField.setAccessible(true);
-    OverScroller scroller = (OverScroller) scrollerField.get(forScrollView);
-
-    return new FlingProperty(scroller);
   }
 }

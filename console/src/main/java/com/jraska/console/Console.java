@@ -145,7 +145,7 @@ public class Console extends FrameLayout {
     text = findViewById(R.id.console_text);
 
     scrollView = findViewById(R.id.console_scroll_view);
-    flingProperty = FlingProperty.create(scrollView);
+    flingProperty = FlingProperty.Companion.create(scrollView);
     userTouchingListener = new UserTouchingListener();
     scrollView.setOnTouchListener(userTouchingListener);
 
