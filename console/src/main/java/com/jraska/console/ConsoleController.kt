@@ -2,6 +2,7 @@ package com.jraska.console
 
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import android.text.SpannableString
 import android.widget.TextView
 
@@ -13,8 +14,7 @@ internal class ConsoleController {
   val consoles: MutableList<WeakReference<Console>> = ArrayList()
   val buffer = ConsoleBuffer()
 
-  private val uiThreadHandler: Handler by lazy { Handler(Looper.getMainLooper()) }
-  private val bufferPrintRunnable = Runnable { runBufferPrint() }
+  private val printBufferHandler: Handler by lazy { PrintBufferHandler(this) }
 
   private val isUIThread: Boolean
     get() = Looper.myLooper() == Looper.getMainLooper()
@@ -66,7 +66,9 @@ internal class ConsoleController {
 
   private fun runBufferPrint() {
     if (!isUIThread) {
-      uiThreadHandler.post(bufferPrintRunnable)
+      if (!printBufferHandler.hasMessages(PRINT_BUFFER)) {
+        printBufferHandler.obtainMessage(PRINT_BUFFER).sendToTarget()
+      }
       return
     }
 
@@ -81,7 +83,16 @@ internal class ConsoleController {
     }
   }
 
+  private class PrintBufferHandler(val controller: ConsoleController) : Handler(Looper.getMainLooper()) {
+    override fun handleMessage(msg: Message) {
+      if (msg.what == PRINT_BUFFER) {
+        controller.runBufferPrint()
+      }
+    }
+  }
+
   companion object {
     val END_LINE = "\n"
+    const val PRINT_BUFFER = 653276
   }
 }
