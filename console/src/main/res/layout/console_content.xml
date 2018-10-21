@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ScrollView
-        android:id="@+id/console_scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#121212"
-        android:scrollbarThumbVertical="@drawable/console_scrollbar_handle">
+  <ScrollView
+    android:id="@+id/console_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:scrollbarThumbVertical="@drawable/console_scrollbar_handle">
 
-        <TextView
-            android:id="@+id/console_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:typeface="monospace"
-            android:textColor="#dddddd" />
-    </ScrollView>
+    <TextView
+      android:id="@+id/console_text"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textColor="#dddddd"
+      android:textIsSelectable="true"
+      android:typeface="monospace"/>
+  </ScrollView>
 
 </merge>
 
