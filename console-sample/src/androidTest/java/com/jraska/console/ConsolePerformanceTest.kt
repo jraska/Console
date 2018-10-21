@@ -10,7 +10,7 @@ class ConsolePerformanceTest {
   var testRule = ActivityTestRule<ConsoleActivity>(ConsoleActivity::class.java)
 
   @Test(timeout = 500) // generous to update Console few times, however it fails when scheduling is improper
-  fun givenTestHighLoad() {
+  fun testHighLoad() {
     for (x in 1..1000) {
       Console.writeLine("sampleText")
     }
