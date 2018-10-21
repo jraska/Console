@@ -41,7 +41,7 @@ class ConsoleTest {
     val testText = "asd5a6das7"
     Console.write(testText)
 
-    assertThat(console.consoleText).contains(testText)
+    assertThat(console.text).contains(testText)
   }
 
   @Test
@@ -49,8 +49,8 @@ class ConsoleTest {
     val testText = "657ad52jh"
     Console.writeLine(testText)
 
-    assertThat(console.consoleText).contains(testText)
-    assertThat(console.consoleText).endsWith(ConsoleController.END_LINE)
+    assertThat(console.text).contains(testText)
+    assertThat(console.text).endsWith(ConsoleController.END_LINE)
   }
 
   @Test
@@ -60,7 +60,7 @@ class ConsoleTest {
 
     Console.write(spannableString)
 
-    assertThat(console.consoleText).isEqualTo(spannableString.toString())
+    assertThat(console.text).isEqualTo(spannableString.toString())
   }
 
   @Test
@@ -70,8 +70,8 @@ class ConsoleTest {
 
     Console.writeLine(spannableString)
 
-    assertThat(console.consoleText).contains(spannableString)
-    assertThat(console.consoleText).endsWith(ConsoleController.END_LINE)
+    assertThat(console.text).contains(spannableString)
+    assertThat(console.text).endsWith(ConsoleController.END_LINE)
   }
 
   @Test
@@ -81,7 +81,7 @@ class ConsoleTest {
 
     Console.clear()
 
-    assertThat(console.consoleText).isEqualTo("")
+    assertThat(console.text).isEqualTo("")
   }
 
   @Test
@@ -90,13 +90,13 @@ class ConsoleTest {
 
     Console.write("123456789")
 
-    assertThat(console.consoleText).isEqualTo("56789")
+    assertThat(console.text).isEqualTo("56789")
 
     for (i in 0..4) {
       Console.writeLine("")
     }
 
-    assertThat(console.consoleText).isEqualTo("\n\n\n\n\n")
+    assertThat(console.text).isEqualTo("\n\n\n\n\n")
   }
 
   @Test
@@ -106,7 +106,7 @@ class ConsoleTest {
     buffer().setSize(6)
     Console.controller.scheduleBufferPrint()
 
-    assertThat(console.consoleText).isEqualTo("456789")
+    assertThat(console.text).isEqualTo("456789")
   }
 
   @Test
@@ -119,7 +119,7 @@ class ConsoleTest {
     buffer().setSize(5)
     Console.controller.scheduleBufferPrint()
 
-    assertThat(console.consoleText).isEqualTo("56789")
+    assertThat(console.text).isEqualTo("56789")
   }
 
   @Test
@@ -139,7 +139,7 @@ class ConsoleTest {
     Console.write("text")
 
     val newConsole = Console(application)
-    assertThat(newConsole.consoleText).isEqualTo("text")
+    assertThat(newConsole.text).isEqualTo("text")
     assertThat(Console.consoleCount()).isEqualTo(2)
   }
 

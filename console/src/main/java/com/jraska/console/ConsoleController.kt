@@ -27,22 +27,22 @@ internal class ConsoleController {
     write(END_LINE)
   }
 
-  fun writeLine(o: Any) {
+  fun writeLine(o: Any?) {
     buffer.append(o).append(END_LINE)
     scheduleBufferPrint()
   }
 
-  fun write(spannableString: SpannableString) {
+  fun write(spannableString: SpannableString?) {
     buffer.append(spannableString)
     scheduleBufferPrint()
   }
 
-  fun writeLine(spannableString: SpannableString) {
+  fun writeLine(spannableString: SpannableString?) {
     buffer.append(spannableString).append(END_LINE)
     scheduleBufferPrint()
   }
 
-  fun write(o: Any) {
+  fun write(o: Any?) {
     buffer.append(o)
     scheduleBufferPrint()
   }

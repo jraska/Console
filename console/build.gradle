@@ -32,9 +32,9 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
   testImplementation 'junit:junit:4.12'
-  testImplementation 'org.robolectric:robolectric:3.7.1'
   testImplementation 'org.mockito:mockito-core:2.22.0'
-  testImplementation 'com.squareup.assertj:assertj-android:1.1.1'
+  testImplementation 'org.assertj:assertj-core:3.11.1'
+  testImplementation 'org.robolectric:robolectric:3.7.1'
 }
 
 ext {
