@@ -23,17 +23,17 @@ then write to it:
 
 ```java
 // Writing to console
-Console.write("This is cool");
-Console.writeLine("More cool");
+Console.write("This is cool")
+Console.writeLine("More cool")
 // Clear it
-Console.clear();
+Console.clear()
 ```
 
 ## Download
 
 Grab via Gradle: 
 ```groovy
-compile 'com.jraska:console:0.4.3'
+implementation 'com.jraska:console:1.0.0'
 ```
 
 ## Timber Tree
@@ -42,7 +42,7 @@ To allow easy integration with [Timber]
 ### Usage
 ```java
 // In your Application or wherever you register your trees
-Timber.plant(new ConsoleTree());
+Timber.plant(new ConsoleTree())
 
 // This will be written to your in-app console view
 Timber.d("Hello Console")
@@ -51,13 +51,13 @@ Timber.d("Hello Console")
 ConsoleTree consoleTree = new ConsoleTree.Builder()
         .debugColor(Color.GRAY)
         // ...
-        .build();
-Timber.plant(consoleTree);
+        .build()
+Timber.plant(consoleTree)
 ```
 
 ### Gradle: 
 ```groovy
-compile 'com.jraska:console-timber-tree:0.4.3'
+implementation 'com.jraska:console-timber-tree:1.0.0'
 ```
 
 ## License
