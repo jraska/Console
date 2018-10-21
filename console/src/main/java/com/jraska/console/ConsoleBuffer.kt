@@ -23,12 +23,14 @@ internal class ConsoleBuffer {
   }
 
   fun append(o: Any?): ConsoleBuffer {
-    return append(o?.toString() ?: "null")
+    return append(o?.toString())
   }
 
-  fun append(charSequence: CharSequence): ConsoleBuffer {
+  fun append(charSequence: CharSequence?): ConsoleBuffer {
+    val toAppend = charSequence ?: "null"
+
     synchronized(lock) {
-      buffer.append(charSequence)
+      buffer.append(toAppend)
       ensureSize()
     }
     return this
