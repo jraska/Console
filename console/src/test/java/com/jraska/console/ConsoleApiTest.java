@@ -8,7 +8,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 26)
+@Config(sdk = 26)
 public class ConsoleApiTest {
   @Test
   public void changeHereMeansBreakingPublicApi() {

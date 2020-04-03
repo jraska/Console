@@ -16,7 +16,7 @@ import java.text.ParsePosition
 import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, sdk = [26])
+@Config(sdk = [26])
 class ConsoleTreeTest {
   val console = Console(application)
 
