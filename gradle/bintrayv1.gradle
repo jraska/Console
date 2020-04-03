@@ -20,7 +20,7 @@ if (project.rootProject.file('local.properties').exists()) {
 
 bintray {
   user = project.getProperties().get("bintray.user")
-  key = properties.getProperty("bintray.apikey")
+  key = project.getProperties().get("bintray.user")
 
   configurations = ['archives']
   pkg {
