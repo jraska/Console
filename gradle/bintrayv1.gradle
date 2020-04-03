@@ -19,7 +19,7 @@ if (project.rootProject.file('local.properties').exists()) {
 }
 
 bintray {
-  user = properties.getProperty("bintray.user")
+  user = project.getProperties().get("bintray.user")
   key = properties.getProperty("bintray.apikey")
 
   configurations = ['archives']
@@ -36,7 +36,7 @@ bintray {
       desc = libraryDescription
       gpg {
         sign = true //Determines whether to GPG sign the files. The default is false
-        passphrase = properties.getProperty("bintray.gpg.password")
+        passphrase = project.getProperties().get("bintray.gpg.password")
         //Optional. The passphrase for GPG signing'
       }
     }
