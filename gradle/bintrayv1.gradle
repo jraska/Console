@@ -7,17 +7,7 @@ task sourcesJar(type: Jar) {
   classifier = 'sources'
 }
 
-task javadoc(type: Javadoc) {
-  source = android.sourceSets.main.java.srcDirs
-  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
 artifacts {
-  archives javadocJar
   archives sourcesJar
 }
 
@@ -29,7 +19,7 @@ if (project.rootProject.file('local.properties').exists()) {
 }
 
 bintray {
-  user = properties.getProperty("bintray.user")
+  user = project.getProperties().get("bintray.user")
   key = properties.getProperty("bintray.apikey")
 
   configurations = ['archives']
@@ -46,7 +36,7 @@ bintray {
       desc = libraryDescription
       gpg {
         sign = true //Determines whether to GPG sign the files. The default is false
-        passphrase = properties.getProperty("bintray.gpg.password")
+        passphrase = project.getProperties().get("bintray.gpg.password")
         //Optional. The passphrase for GPG signing'
       }
     }

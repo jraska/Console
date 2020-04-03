@@ -7,7 +7,7 @@ import org.junit.Test
 
 class ConsolePerformanceTest {
   @get:Rule
-  var testRule = ActivityTestRule<ConsoleActivity>(ConsoleActivity::class.java)
+  var testRule = ActivityTestRule(ConsoleActivity::class.java)
 
   @Test(timeout = 500) // generous to update Console few times, however it fails when scheduling is improper
   fun testHighLoad() {
