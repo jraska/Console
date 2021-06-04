@@ -31,7 +31,7 @@ Console.clear()
 
 Grab via Gradle: 
 ```groovy
-implementation 'com.jraska:console:1.1.0'
+implementation 'com.jraska:console:1.2.0'
 ```
 
 ## Timber Tree
@@ -55,7 +55,7 @@ Timber.plant(consoleTree)
 
 ### Gradle: 
 ```groovy
-implementation 'com.jraska:console-timber-tree:1.1.0'
+implementation 'com.jraska:console-timber-tree:1.2.0'
 ```
 
 ## License
