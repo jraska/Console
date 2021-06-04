@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 version = rootProject.ext.version
-group = 'com.jraska.livedata'
+group = 'com.jraska'
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
