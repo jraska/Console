@@ -1,7 +1,7 @@
 # Console
 An Android console view, which allows you to log text using static calls, to easily debug your application, whilst avoiding memory leaks.
 
-[![Sample](https://img.shields.io/badge/Download-Sample-blue.svg)](https://drive.google.com/file/d/0B0T1YjC17C-rTDBWNDBaSWVhcjg/view?usp=sharing)
+[![Sample](https://img.shields.io/badge/Download-Sample-blue.svg)](https://drive.google.com/file/d/0B0T1YjC17C-rTDBWNDBaSWVhcjg/view?usp=sharing&resourcekey=0-NiO0BiU7EsIC45ijs4fArQ)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg) ](https://github.com/jraska/Console/blob/master/LICENSE)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Console-green.svg?style=true)](https://android-arsenal.com/details/1/3948)
 
